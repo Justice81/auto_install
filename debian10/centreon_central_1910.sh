@@ -308,7 +308,7 @@ cd ${DL_DIR}/monitoring-plugins-${PLUGIN_VER}
 [ "$SCRIPT_VERBOSE" = true ] && echo "====> Compilation" | tee -a ${INSTALL_LOG}
 
 ./configure --with-nagios-user=${ENGINE_USER} --with-nagios-group=${ENGINE_GROUP} \
---prefix=/usr/lib/nagios/plugins --libexecdir=/usr/lib/nagios/plugins --enable-perl-modules --with-openssl=/usr/bin/openssl \
+--prefix=/usr/local/nagios/libexec --libexecdir=/usr/local/nagios/libexec --enable-perl-modules --with-openssl=/usr/bin/openssl \
 --enable-extra-opts >> ${INSTALL_LOG}
 
 make >> ${INSTALL_LOG}
@@ -485,7 +485,7 @@ CENTREON_BINDIR="${INSTALL_DIR}/centreon/bin"
 CENTREON_DATADIR="${INSTALL_DIR}/centreon/data"
 CENTREON_USER=${CENTREON_USER}
 CENTREON_GROUP=${CENTREON_GROUP}
-PLUGIN_DIR="/usr/lib/nagios/plugins"
+PLUGIN_DIR="/usr/local/nagios/libexec"
 CENTREON_LOG="/var/log/centreon"
 CENTREON_ETC="/etc/centreon"
 CENTREON_RUNDIR="/var/run/centreon"
@@ -514,7 +514,7 @@ MONITORINGENGINE_LOG="/var/log/centreon-engine"
 MONITORINGENGINE_INIT_SCRIPT="centengine"
 MONITORINGENGINE_BINARY="/usr/sbin/centengine"
 MONITORINGENGINE_ETC="/etc/centreon-engine"
-NAGIOS_PLUGIN="/usr/lib/nagios/plugins"
+NAGIOS_PLUGIN="/usr/local/nagios/libexec"
 FORCE_NAGIOS_USER=1
 NAGIOS_GROUP="${CENTREON_GROUP}"
 FORCE_NAGIOS_GROUP=1
@@ -879,7 +879,7 @@ cd ${DL_DIR}/nrpe-nrpe-${NRPE_VERSION}
 
 [ "$SCRIPT_VERBOSE" = true ] && echo "====> Compilation" | tee -a ${INSTALL_LOG}
 
-./configure --with-nagios-user=${ENGINE_USER} --with-nrpe-user=${ENGINE_USER} --with-nagios-group=${ENGINE_USER} --with-nrpe-group=${ENGINE_USER} --libexecdir=/usr/lib/nagios/plugins  >> ${INSTALL_LOG}
+./configure --with-nagios-user=${ENGINE_USER} --with-nrpe-user=${ENGINE_USER} --with-nagios-group=${ENGINE_USER} --with-nrpe-group=${ENGINE_USER} --libexecdir=/usr/local/nagios/libexec  >> ${INSTALL_LOG}
 make all  >> ${INSTALL_LOG}
 make install-plugin  >> ${INSTALL_LOG}
 }
