@@ -502,7 +502,7 @@ function centreon_install () {
 " | tee -a ${INSTALL_LOG}
 
 DEBIAN_FRONTEND=noninteractive apt-get install -y --force-yes sudo tofrodos bsd-mailx \
-  lsb-release apache2  \
+  lsb-release \
   librrds-perl libconfig-inifiles-perl libcrypt-des-perl \
   libdigest-hmac-perl libdigest-sha-perl libcrypt-des-ede3-perl libdbd-sqlite3-perl \
   snmp snmpd snmptrapd libnet-snmp-perl libsnmp-perl snmp-mibs-downloader ntp  >> ${INSTALL_LOG}
