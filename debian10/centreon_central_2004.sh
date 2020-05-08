@@ -1,44 +1,74 @@
 #!/bin/bash
-# Centreon 19.04 + engine install script for Debian Buster
-# v 1.48
-# 04/04/2020
-# Thanks to Remy and Pixelabs
+# Centreon 20.04 + engine install script for Debian Buster
+# v 1.49
+# 01/05/2020
+# Thanks to Remy, Justice81 and Pixelabs
 #
 export DEBIAN_FRONTEND=noninteractive
 # Variables
 ## Versions
-VERSION_BATCH="v 1.48"
-CLIB_VER="19.04.1"
-CONNECTOR_VER="19.04.1"
-ENGINE_VER="19.04.3"
+VERSION_BATCH="v 1.49"
+CLIB_VER=("20.04.0" "0")
+CONNECTOR_VER=("20.04.0" "0")
+ENGINE_VER=("20.04.0" "0")
 PLUGIN_VER="2.2"
-PLUGIN_CENTREON_VER="20200204"
-BROKER_VER="19.04.0"
-CENTREON_VER="19.04.13"
+PLUGIN_CENTREON_VER=("20200204" "0")
+BROKER_VER=("20.04.0" "0")
+GORGONE_VER=("20.04.1" "0")
+CENTREON_VER=("20.04.0" "0")
 # MariaDB Series
 MARIADB_VER='10.0'
 ## Sources URL
+BASE_GITHUB="https://github.com/centreon"
 BASE_URL="http://files.download.centreon.com/public"
-CLIB_URL="${BASE_URL}/centreon-clib/centreon-clib-${CLIB_VER}.tar.gz"
-CONNECTOR_URL="${BASE_URL}/centreon-connectors/centreon-connector-${CONNECTOR_VER}.tar.gz"
-ENGINE_URL="${BASE_URL}/centreon-engine/centreon-engine-${ENGINE_VER}.tar.gz"
+if [[ ${CLIB_VER[1]} == "1" ]]; then
+  CLIB_URL="${BASE_GITHUB}/centreon-clib/archive/${CLIB_VER[0]}.tar.gz"
+else
+  CLIB_URL="${BASE_URL}/centreon-clib/centreon-clib-${CLIB_VER[0]}.tar.gz"
+fi
+if [[ ${CONNECTOR_VER[1]} == "1" ]]; then
+  CONNECTOR_URL="${BASE_GITHUB}/centreon-connectors/archive/${CONNECTOR_VER[0]}.tar.gz"
+else
+  CONNECTOR_URL="${BASE_URL}/centreon-connectors/centreon-connectors-${CONNECTOR_VER[0]}.tar.gz"
+fi
+if [[ ${CLIB_VER[1]} == "1" ]]; then
+  ENGINE_URL="${BASE_GITHUB}/centreon-engine/archive/${ENGINE_VER[0]}.tar.gz"
+else
+  ENGINE_URL="${BASE_URL}/centreon-engine/centreon-engine-${ENGINE_VER[0]}.tar.gz"
+fi
 PLUGIN_URL="https://www.monitoring-plugins.org/download/monitoring-plugins-${PLUGIN_VER}.tar.gz"
-PLUGIN_CENTREON_URL="${BASE_URL}/centreon-plugins/centreon-plugins-${PLUGIN_CENTREON_VER}.tar.gz"
-BROKER_URL="${BASE_URL}/centreon-broker/centreon-broker-${BROKER_VER}.tar.gz"
-CENTREON_URL="${BASE_URL}/centreon/centreon-web-${CENTREON_VER}.tar.gz"
-CLAPI_URL="${BASE_URL}/Modules/CLAPI/centreon-clapi-${CLAPI_VER}.tar.gz"
-## Sources widgetsMonitoring engine init.d script
-WIDGET_HOST_VER="19.04.3"
-WIDGET_HOSTGROUP_VER="19.04.1"
-WIDGET_SERVICE_VER="19.04.3"
-WIDGET_SERVICEGROUP_VER="19.04.1"
-WIDGET_GRID_MAP_VER="19.04.1"
-WIDGET_TOP_CPU_VER="19.04.2"
-WIDGET_TOP_MEMORY_VER="19.04.1"
-WIDGET_TACTICAL_OVERVIEW_VER="19.04.1"
-WIDGET_HTTP_LOADER_VER="19.04.1"
-WIDGET_ENGINE_STATUS_VER="19.04.2"
-WIDGET_GRAPH_VER="19.04.1"
+if [[ ${PLUGIN_CENTREON_VER[1]} == "1" ]]; then
+  PLUGIN_CENTREON_URL="${BASE_GITHUB}/centreon-plugins/archive/${PLUGIN_CENTREON_VER[0]}.tar.gz"
+else
+  PLUGIN_CENTREON_URL="${BASE_URL}/centreon-plugins/centreon-plugins-${PLUGIN_CENTREON_VER[0]}.tar.gz"
+fi
+if [[ ${BROKER_VER[1]} == "1" ]]; then
+  BROKER_URL="${BASE_GITHUB}/centreon-broker/archive/${BROKER_VER[0]}.tar.gz"
+else
+  BROKER_URL="${BASE_URL}/centreon-broker/centreon-broker-${BROKER_VER[0]}.tar.gz"
+fi
+if [[ ${GORGONE_VER[1]} == "1" ]]; then
+  GORGONE_URL="${BASE_GITHUB}/centreon-gorgone/archive/${GORGONE_VER[0]}.tar.gz"
+else
+  GORGONE_URL="${BASE_URL}/centreon-gorgone/centreon-gorgone-${GORGONE_VER[0]}.tar.gz"
+fi
+if [[ ${CENTREON_VER[1]} == "1" ]]; then
+  CENTREON_URL="${BASE_GITHUB}/centreon/archive/${CENTREON_VER[0]}.tar.gz"
+else
+  CENTREON_URL="${BASE_URL}/centreon/centreon-web-${CENTREON_VER[0]}.tar.gz"
+fi
+## Sources widgets 
+WIDGET_HOST_VER="20.04.0"
+WIDGET_HOSTGROUP_VER="20.04.0"
+WIDGET_SERVICE_VER="20.04.0"
+WIDGET_SERVICEGROUP_VER="20.04.0"
+WIDGET_GRID_MAP_VER="20.04.0"
+WIDGET_TOP_CPU_VER="20.04.0"
+WIDGET_TOP_MEMORY_VER="20.04.0"
+WIDGET_TACTICAL_OVERVIEW_VER="20.04.0"
+WIDGET_HTTP_LOADER_VER="20.04.0"
+WIDGET_ENGINE_STATUS_VER="20.04.0"
+WIDGET_GRAPH_VER="20.04.0"
 WIDGET_BASE="http://files.download.centreon.com/public/centreon-widgets"
 WIDGET_HOST="${WIDGET_BASE}/centreon-widget-host-monitoring/centreon-widget-host-monitoring-${WIDGET_HOST_VER}.tar.gz"
 WIDGET_HOSTGROUP="${WIDGET_BASE}/centreon-widget-hostgroup-monitoring/centreon-widget-hostgroup-monitoring-${WIDGET_HOSTGROUP_VER}.tar.gz"
@@ -72,12 +102,15 @@ BROKER_GROUP="centreon-broker"
 CENTREON_USER="centreon"
 CENTREON_GROUP="centreon"
 ## TMPL file (template install file for Centreon)
-CENTREON_TMPL="centreon_engine.tmpl"
+CENTREON_TMPL="centreon_install.tmpl"
+GORGONE_TMPL="gorgone.tmpl"
 ETH0_IP=`/sbin/ip route get 8.8.8.8 | /usr/bin/awk 'NR==1 {print $7}'`
 ## TimeZone php
 VARTIMEZONE="Europe/Paris"
 ## verbose script
 SCRIPT_VERBOSE=false
+## nb processor
+NB_PROC=`cat /proc/cpuinfo | grep processor | wc -l`
 
 # Usage info
 show_help() {
@@ -127,6 +160,52 @@ function mariadb_install() {
 " | tee -a ${INSTALL_LOG}
 
 apt-get install -y mariadb-server >> ${INSTALL_LOG}
+
+[ "$SCRIPT_VERBOSE" = true ] && echo "====> Configure mariadb" | tee -a ${INSTALL_LOG}
+# Add mysql config for Centreon
+cat >  /etc/mysql/conf.d/centreon.cnf << EOF
+#
+# Custom MySQL/MariaDB server configuration for Centreon
+#
+[server]
+innodb_file_per_table=1
+open_files_limit = 32000
+
+key_buffer_size = 256M
+sort_buffer_size = 32M
+join_buffer_size = 4M
+thread_cache_size = 64
+read_buffer_size = 512K
+read_rnd_buffer_size = 256K
+max_allowed_packet = 8M
+
+# For 4 Go Ram
+#innodb_additional_mem_pool_size=512M
+#innodb_buffer_pool_size=512M
+
+# For 8 Go Ram
+#innodb_additional_mem_pool_size=1G
+#innodb_buffer_pool_size=1G
+EOF
+
+# Modifiy config systemd
+mkdir /etc/systemd/system/mariadb.service.d
+cat >  /etc/systemd/system/mariadb.service.d/limitnofile.conf <<EOF
+[Service]
+LimitNOFILE=32000
+EOF
+
+systemctl daemon-reload >> ${INSTALL_LOG}
+systemctl restart mysql >> ${INSTALL_LOG}
+
+# Change MySQL Server authentication plugin for root user
+/usr/bin/mysql <<EOF
+use mysql;
+update user set plugin='' where user='root';
+flush privileges;
+EOF
+
+
 }
 
 function clib_install () {
@@ -136,31 +215,32 @@ function clib_install () {
 ======================================================================
 " | tee -a ${INSTALL_LOG}
 
-apt-get install -y build-essential cmake >> ${INSTALL_LOG}
+apt-get install -y cmake python3-pip >> ${INSTALL_LOG}
 
 cd ${DL_DIR}
 if [[ -e centreon-clib-${CLIB_VER}.tar.gz ]] ;
   then
     echo 'File already exist !' | tee -a ${INSTALL_LOG}
   else
-    wget ${CLIB_URL} -O ${DL_DIR}/centreon-clib-${CLIB_VER}.tar.gz >> ${INSTALL_LOG}
+    wget ${CLIB_URL} -O ${DL_DIR}/centreon-clib-${CLIB_VER[0]}.tar.gz >> ${INSTALL_LOG}
+    [ $? != 0 ] && return 1
 fi
 
-tar xzf centreon-clib-${CLIB_VER}.tar.gz
-cd centreon-clib-${CLIB_VER}
+tar xzf centreon-clib-${CLIB_VER[0]}.tar.gz
+cd centreon-clib-${CLIB_VER[0]}
+mkdir build
+cd build
 
 [ "$SCRIPT_VERBOSE" = true ] && echo "====> Compilation" | tee -a ${INSTALL_LOG}
 
-# add directive compilation
-sed -i '32i\set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++98 -fpermissive")' ${DL_DIR}/centreon-clib-${CLIB_VER}/CMakeLists.txt
 
 cmake \
    -DWITH_TESTING=0 \
    -DWITH_PREFIX=/usr \
    -DWITH_SHARED_LIB=1 \
    -DWITH_STATIC_LIB=0 \
-   -DWITH_PKGCONFIG_DIR=/usr/lib/pkgconfig . >> ${INSTALL_LOG}
-make >> ${INSTALL_LOG}
+   -DWITH_PKGCONFIG_DIR=/usr/lib/pkgconfig .. >> ${INSTALL_LOG}
+make -j $NB_PROC >> ${INSTALL_LOG}
 make install >> ${INSTALL_LOG}
 
 }
@@ -168,62 +248,39 @@ make install >> ${INSTALL_LOG}
 function centreon_connectors_install () {
 [ "$SCRIPT_VERBOSE" = true ] && echo "
 ======================================================================
-               Install Centreon Perl connectors
+               Install Centreon Connectors
 ======================================================================
 " | tee -a ${INSTALL_LOG}
-apt-get install -y libperl-dev >> ${INSTALL_LOG}
+apt-get install -y libperl-dev libssh2-1-dev libgcrypt-dev >> ${INSTALL_LOG}
+/usr/bin/pip3 install conan >> ${INSTALL_LOG}
+/usr/local/bin/conan remote add centreon https://api.bintray.com/conan/centreon/centreon >> ${INSTALL_LOG}
 
 cd ${DL_DIR}
-if [[ -e centreon-connector-${CONNECTOR_VER}.tar.gz ]]
+if [[ -e centreon-connectors-${CONNECTOR_VER[0]}.tar.gz ]]
   then
     echo 'File already exist !' | tee -a ${INSTALL_LOG}
   else
-    wget ${CONNECTOR_URL} -O ${DL_DIR}/centreon-connector-${CONNECTOR_VER}.tar.gz >> ${INSTALL_LOG}
+    wget ${CONNECTOR_URL} -O ${DL_DIR}/centreon-connectors-${CONNECTOR_VER[0]}.tar.gz >> ${INSTALL_LOG}
     [ $? != 0 ] && return 1
 fi
 
-tar xzf centreon-connector-${CONNECTOR_VER}.tar.gz
-cd ${DL_DIR}/centreon-connector-${CONNECTOR_VER}/perl/build
+tar xzf centreon-connectors-${CONNECTOR_VER[0]}.tar.gz
+cd ${DL_DIR}/centreon-connectors-${CONNECTOR_VER[0]}
+mkdir build
+cd build
 
 [ "$SCRIPT_VERBOSE" = true ] && echo "====> Compilation" | tee -a ${INSTALL_LOG}
 
-# add directive compilation
-sed -i '27i\set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++98 -fpermissive")' ${DL_DIR}/centreon-connector-${CONNECTOR_VER}/perl/build/CMakeLists.txt
+/usr/local/bin/conan install .. >> ${INSTALL_LOG}
 
 cmake \
  -DWITH_PREFIX=/usr  \
  -DWITH_PREFIX_BINARY=/usr/lib/centreon-connector  \
  -DWITH_CENTREON_CLIB_INCLUDE_DIR=/usr/include \
- -DWITH_TESTING=0 . >> ${INSTALL_LOG}
-make >> ${INSTALL_LOG}
+ -DWITH_TESTING=0 .. >> ${INSTALL_LOG}
+make -j $NB_PROC >> ${INSTALL_LOG}
 make install >> ${INSTALL_LOG}
 
-[ "$SCRIPT_VERBOSE" = true ] && echo "
-======================================================================
-               Install Centreon SSH connectors
-======================================================================
-" | tee -a ${INSTALL_LOG}
-# install Centreon SSH Connector
-apt-get install -y libssh2-1-dev libgcrypt-dev >> ${INSTALL_LOG}
-
-# Cleanup to prevent space full on /var
-apt-get clean >> ${INSTALL_LOG}
-
-cd ${DL_DIR}/centreon-connector-${CONNECTOR_VER}/ssh/build
-
-[ "$SCRIPT_VERBOSE" = true ] && echo "====> Compilation" | tee -a ${INSTALL_LOG}
-
-# add directive compilation
-sed -i '27i\set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++98 -fpermissive")' ${DL_DIR}/centreon-connector-${CONNECTOR_VER}/ssh/build/CMakeLists.txt
-
-
-cmake \
- -DWITH_PREFIX=/usr  \
- -DWITH_PREFIX_BINARY=/usr/lib/centreon-connector  \
- -DWITH_CENTREON_CLIB_INCLUDE_DIR=/usr/include \
- -DWITH_TESTING=0 . >> ${INSTALL_LOG}
-make >> ${INSTALL_LOG}
-make install >> ${INSTALL_LOG}
 }
 
 function centreon_engine_install () {
@@ -242,21 +299,22 @@ apt-get install -y libcgsi-gsoap-dev zlib1g-dev libssl-dev libxerces-c-dev >> ${
 apt-get clean >> ${INSTALL_LOG}
 
 cd ${DL_DIR}
-if [[ -e centreon-engine-${ENGINE_VER}.tar.gz ]]
+if [[ -e centreon-engine-${ENGINE_VER[0]}.tar.gz ]]
   then
     echo 'File already exist !' | tee -a ${INSTALL_LOG}
   else
-    wget ${ENGINE_URL} -O ${DL_DIR}/centreon-engine-${ENGINE_VER}.tar.gz >> ${INSTALL_LOG}
+    wget ${ENGINE_URL} -O ${DL_DIR}/centreon-engine-${ENGINE_VER[0]}.tar.gz >> ${INSTALL_LOG}
     [ $? != 0 ] && return 1
 fi
 
-tar xzf centreon-engine-${ENGINE_VER}.tar.gz
-cd ${DL_DIR}/centreon-engine-${ENGINE_VER}/build
+tar xzf centreon-engine-${ENGINE_VER[0]}.tar.gz
+cd ${DL_DIR}/centreon-engine-${ENGINE_VER[0]}
+mkdir build
+cd build
 
 [ "$SCRIPT_VERBOSE" = true ] && echo "====> Compilation" | tee -a ${INSTALL_LOG}
 
-# add directive compilation
-sed -i '32i\set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++98 -fpermissive")' ${DL_DIR}/centreon-engine-${ENGINE_VER}/build/CMakeLists.txt
+/usr/local/bin/conan install .. >> ${INSTALL_LOG}
 
 cmake \
    -DWITH_CENTREON_CLIB_INCLUDE_DIR=/usr/include \
@@ -273,8 +331,8 @@ cmake \
    -DWITH_STARTUP_DIR=/lib/systemd/system  \
    -DWITH_PKGCONFIG_SCRIPT=1 \
    -DWITH_PKGCONFIG_DIR=/usr/lib/pkgconfig \
-   -DWITH_TESTING=0 . >> ${INSTALL_LOG}
-make >> ${INSTALL_LOG}
+   -DWITH_TESTING=0 .. >> ${INSTALL_LOG}
+make -j $NB_PROC >> ${INSTALL_LOG}
 make install >> ${INSTALL_LOG}
 
 systemctl enable centengine.service >> ${INSTALL_LOG}
@@ -313,7 +371,7 @@ cd ${DL_DIR}/monitoring-plugins-${PLUGIN_VER}
 --prefix=/usr/lib/nagios/plugins --libexecdir=/usr/lib/nagios/plugins --enable-perl-modules --with-openssl=/usr/bin/openssl \
 --enable-extra-opts >> ${INSTALL_LOG}
 
-make >> ${INSTALL_LOG}
+make -j $NB_PROC >> ${INSTALL_LOG}
 make install >> ${INSTALL_LOG}
 }
 
@@ -330,38 +388,22 @@ DEBIAN_FRONTEND=noninteractive apt-get install -y --force-yes libxml-libxml-perl
             libnet-telnet-perl libnet-ntp-perl libnet-dns-perl libdbi-perl libdbd-mysql-perl libdbd-pg-perl git-core >> ${INSTALL_LOG}
 
 cd ${DL_DIR}
-if [[ -e centreon-plugins-${PLUGIN_CENTREON_VER}.tar.gz ]]
+if [[ -e centreon-plugins-${PLUGIN_CENTREON_VER[0]}.tar.gz ]]
   then
     echo 'File already exist !' | tee -a ${INSTALL_LOG}
   else
-    wget ${PLUGIN_CENTREON_URL} -O ${DL_DIR}/centreon-plugins-${PLUGIN_CENTREON_VER}.tar.gz >> ${INSTALL_LOG}
+    wget ${PLUGIN_CENTREON_URL} -O ${DL_DIR}/centreon-plugins-${PLUGIN_CENTREON_VER[0]}.tar.gz >> ${INSTALL_LOG}
 fi
 
-tar xzf centreon-plugins-${PLUGIN_CENTREON_VER}.tar.gz
-cd ${DL_DIR}/centreon-plugins-${PLUGIN_CENTREON_VER}
+tar xzf centreon-plugins-${PLUGIN_CENTREON_VER[0]}.tar.gz
+cd ${DL_DIR}/centreon-plugins-${PLUGIN_CENTREON_VER[0]}
 
 chown -R ${ENGINE_USER}:${ENGINE_GROUP} *
 chmod +x *
 mkdir -p /usr/lib/centreon/plugins
 cp -Rp * /usr/lib/centreon/plugins/
 
-#bug plugin 20191016
-if [[ ${PLUGIN_CENTREON_VER} == "20191016" ]]; then
-  cd ${DL_DIR}
-  if [[ -e centreon-plugins-20190704.tar.gz ]]
-  then
-    echo 'File already exist !' | tee -a ${INSTALL_LOG}
-  else
-    wget http://files.download.centreon.com/public/centreon-plugins/centreon-plugins-20190704.tar.gz -O ${DL_DIR}/centreon-plugins-20190704.tar.gz >> ${INSTALL_LOG}
-  fi
 
-  tar xzf centreon-plugins-20190704.tar.gz
-  cd ${DL_DIR}/centreon-plugins-20190704
-  chown -R ${ENGINE_USER}:${ENGINE_GROUP} *
-  chmod +x *
-  cp centreon_centreon_database.pl /usr/lib/centreon/plugins/
-  cp centreon_mysql.pl /usr/lib/centreon/plugins/
-fi
 
 }
 
@@ -376,55 +418,28 @@ groupadd -g 6002 ${BROKER_GROUP}
 useradd -u 6002 -g ${BROKER_GROUP} -m -r -d /var/lib/centreon-broker -c "Centreon-broker Admin" -s /bin/bash  ${BROKER_USER}
 usermod -aG ${BROKER_GROUP} ${ENGINE_USER}
 
-apt-get install -y libqt4-dev libqt4-sql-mysql libgnutls28-dev lsb-release liblua5.2-dev lsb-release >> ${INSTALL_LOG}
-
-[ "$SCRIPT_VERBOSE" = true ] && echo "
-==================   Install rrdtools 1.4.7     =====================
-" | tee -a ${INSTALL_LOG}
-
-# package for rrdtools
-apt-get install -y libpango1.0-dev libxml2-dev >> ${INSTALL_LOG}
-
-# compile rrdtools
-cd ${DL_DIR}
-wget http://oss.oetiker.ch/rrdtool/pub/rrdtool-1.4.7.tar.gz >> ${INSTALL_LOG}
-[ $? != 0 ] && return 1
-tar xzf rrdtool-1.4.7.tar.gz
-cd ${DL_DIR}/rrdtool-1.4.7
-
-[ "$SCRIPT_VERBOSE" = true ] && echo "====> Compilation rrdtool" | tee -a ${INSTALL_LOG}
-
-./configure --prefix=/opt/rddtool-broker >> ${INSTALL_LOG}
-make >> ${INSTALL_LOG}
-make install >> ${INSTALL_LOG}
-
-cp /opt/rddtool-broker/lib/pkgconfig/librrd.pc /usr/lib/pkgconfig/
-
-#create ldconfig file
-cat >  /etc/ld.so.conf.d/rrdtool-broker.conf << EOF
-# lib rrdtools for Centreon
-/opt/rddtool-broker/lib
-EOF
+apt-get install git librrd-dev libmariadb-dev libgnutls28-dev lsb-release liblua5.2-dev -y >> ${INSTALL_LOG}
 
 # Cleanup to prevent space full on /var
 apt-get clean >> ${INSTALL_LOG}
 
 cd ${DL_DIR}
-if [[ -e centreon-broker-${BROKER_VER}.tar.gz ]]
+if [[ -e centreon-broker-${BROKER_VER[0]}.tar.gz ]]
   then
     echo 'File already exist !' | tee -a ${INSTALL_LOG}
   else
-    wget ${BROKER_URL} -O ${DL_DIR}/centreon-broker-${BROKER_VER}.tar.gz >> ${INSTALL_LOG}
+    wget ${BROKER_URL} -O ${DL_DIR}/centreon-broker-${BROKER_VER[0]}.tar.gz >> ${INSTALL_LOG}
     [ $? != 0 ] && return 1
 fi
 
-tar xzf centreon-broker-${BROKER_VER}.tar.gz
-cd ${DL_DIR}/centreon-broker-${BROKER_VER}/build/
+tar xzf centreon-broker-${BROKER_VER[0]}.tar.gz
+cd ${DL_DIR}/centreon-broker-${BROKER_VER[0]}
+mkdir build
+cd build
 
 [ "$SCRIPT_VERBOSE" = true ] && echo "====> Compilation broker" | tee -a ${INSTALL_LOG}
 
-# add directive compilation
-sed -i '32i\set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++98 -fpermissive")' ${DL_DIR}/centreon-broker-${BROKER_VER}/build/CMakeLists.txt
+/usr/local/bin/conan install .. >> ${INSTALL_LOG}
 
 cmake \
     -DWITH_DAEMONS='central-broker;central-rrd' \
@@ -438,8 +453,8 @@ cmake \
     -DWITH_STARTUP_SCRIPT=systemd  \
     -DWITH_STARTUP_DIR=/lib/systemd/system  \
     -DWITH_TESTING=0 \
-    -DWITH_USER=${BROKER_USER} . >> ${INSTALL_LOG}
-make >> ${INSTALL_LOG}
+    -DWITH_USER=${BROKER_USER} .. >> ${INSTALL_LOG}
+make -j $NB_PROC >> ${INSTALL_LOG}
 make install >> ${INSTALL_LOG}
 systemctl enable cbd.service >> ${INSTALL_LOG}
 systemctl daemon-reload >> ${INSTALL_LOG}
@@ -470,25 +485,118 @@ function php_fpm_install() {
 " | tee -a ${INSTALL_LOG}
 
 apt-get install php php7.3-opcache libapache2-mod-php php-mysql \
-	php-curl php-json php-gd php-intl php-mbstring \
-	php-xml php-zip php-fpm php-readline -y >> ${INSTALL_LOG}
-	
-
-DEBIAN_FRONTEND=noninteractive apt-get install -y --force-yes php-sqlite3 \
-	php-pear sudo tofrodos bsd-mailx lsb-release mariadb-server \
-	libconfig-inifiles-perl libcrypt-des-perl php7.3-db  \
-	libdigest-hmac-perl libdigest-sha-perl libgd-perl php-ldap php-snmp \
-	snmp snmpd snmptrapd libnet-snmp-perl libsnmp-perl snmp-mibs-downloader ntp >> ${INSTALL_LOG}
+        php-curl php-json php-gd php-intl php-mbstring php-xml \
+        php-zip php-fpm php-readline ntp rrdtool php-sqlite3 \
+        php-pear sudo tofrodos bsd-mailx lsb-release \
+        libconfig-inifiles-perl libcrypt-des-perl librrds-perl \
+        libdigest-hmac-perl libdigest-sha-perl libgd-perl php-ldap \
+        php-snmp php7.3-db php-date ntp \
+        libsnmp-perl snmpd snmptrapd snmp-mibs-downloader -y >> ${INSTALL_LOG}
 
 
 # Cleanup to prevent space full on /var
 apt-get clean >> ${INSTALL_LOG}
+
+# add Timezone
+VARTIMEZONEP=`echo ${VARTIMEZONE} | sed 's:\/:\\\/:g' `
+sed -i -e "s/;date.timezone =/date.timezone = ${VARTIMEZONEP}/g" /etc/php/7.3/fpm/php.ini
 
 a2enmod proxy_fcgi setenvif proxy rewrite >> ${INSTALL_LOG}
 a2enconf php7.3-fpm >> ${INSTALL_LOG}
 a2dismod php7.3 >> ${INSTALL_LOG}
 systemctl restart apache2 php7.3-fpm >> ${INSTALL_LOG}
 
+}
+
+function centreon_gorgone_install() {
+[ "$SCRIPT_VERBOSE" = true ] && echo "
+======================================================================
+                     Install Centreon Gorgone
+======================================================================
+" | tee -a ${INSTALL_LOG}
+	
+apt install libzmq3-dev libssh-dev libextutils-makemaker-cpanfile-perl \
+            libmodule-build-perl libmodule-install-perl -y >> ${INSTALL_LOG}
+	
+[ "$SCRIPT_VERBOSE" = true ] && echo "====> Install ZMQ-LibZMQ4" | tee -a ${INSTALL_LOG}
+cd ${DL_DIR}
+wget http://search.cpan.org/CPAN/authors/id/M/MO/MOSCONI/ZMQ-LibZMQ4-0.01.tar.gz >> ${INSTALL_LOG}
+tar zxf ZMQ-LibZMQ4-0.01.tar.gz 
+cd ZMQ-LibZMQ4-0.01
+sed -i -e "s/tools/.\/tools/g" Makefile.PL
+perl Makefile.PL >> ${INSTALL_LOG}
+make -j $NB_PROC >> ${INSTALL_LOG}
+make install >> ${INSTALL_LOG}
+cd ..
+wget https://cpan.metacpan.org/authors/id/D/DM/DMAKI/ZMQ-Constants-1.04.tar.gz >> ${INSTALL_LOG}
+tar zxf ZMQ-Constants-1.04.tar.gz
+cd ZMQ-Constants-1.04
+perl Makefile.PL >> ${INSTALL_LOG}
+make -j $NB_PROC >> ${INSTALL_LOG}
+make install >> ${INSTALL_LOG}
+
+[ "$SCRIPT_VERBOSE" = true ] && echo "====> Install lib-ssh" | tee -a ${INSTALL_LOG}
+cd ${DL_DIR}
+/usr/bin/git clone https://github.com/garnier-quentin/perl-libssh.git >> ${INSTALL_LOG}
+cd perl-libssh
+perl Makefile.PL >> ${INSTALL_LOG}
+make -j $NB_PROC >> ${INSTALL_LOG}
+make install >> ${INSTALL_LOG}
+
+[ "$SCRIPT_VERBOSE" = true ] && echo "
+==================   Install Gorgone     =====================
+" | tee -a ${INSTALL_LOG}
+apt install libcryptx-perl libschedule-cron-perl libcrypt-cbc-perl \
+           libcpanel-json-xs-perl libjson-pp-perl libyaml-perl \
+           libyaml-libyaml-perl libdbd-sqlite3-perl libdbd-mysql-perl \
+           libapache-dbi-perl libdata-uuid-perl libhttp-daemon-perl \
+           libhttp-message-perl libmime-base64-urlsafe-perl \
+           libdigest-md5-file-perl libwww-curl-perl libio-socket-ssl-perl \
+           libnetaddr-ip-perl libhash-merge-perl -y >> ${INSTALL_LOG}
+
+cd ${DL_DIR}
+if [[ -e centreon-gorgone-${GORGONE_VER[0]}.tar.gz ]]
+  then
+    echo 'File already exist !' | tee -a ${INSTALL_LOG}
+  else
+    wget ${GORGONE_URL} -O ${DL_DIR}/centreon-gorgone-${GORGONE_VER[0]}.tar.gz >> ${INSTALL_LOG}
+    [ $? != 0 ] && return 1
+fi
+
+tar xzf centreon-gorgone-${GORGONE_VER[0]}.tar.gz
+cd ${DL_DIR}/centreon-gorgone-${GORGONE_VER[0]}
+
+# remplace script install.sh
+cp ${DIR_SCRIPT}/libinstall/install_gorgone.sh ${DL_DIR}/centreon-gorgone-${GORGONE_VER[0]}/install.sh >> ${INSTALL_LOG}
+
+[ "$SCRIPT_VERBOSE" = true ] && echo "====> Create template Gorgone" | tee -a ${INSTALL_LOG}
+cat > ${DL_DIR}/${GORGONE_TMPL} << EOF
+# gorgone template
+# deployment paths
+GORGONE_LOG="/var/log/centreon-gorgone"
+GORGONE_VARLIB="/var/lib/centreon-gorgone"
+GORGONE_ETC="/etc/centreon-gorgone"
+GORGONE_CONF_FILE="/config.yaml"
+GORGONE_BINDIR="/usr/bin/"
+
+# perl related paths
+GORGONE_PERL="/usr/share/perl5/"
+
+# system tools paths
+INIT_D="/etc/init.d"
+CRON_D="/etc/cron.d"
+LOGROTATE_D="/etc/logrotate.d"
+SYSTEM_D="/etc/systemd/system"
+SYSCONFIG="/etc/default"
+
+# user and group
+GORGONE_USER="centreon-gorgone"
+GORGONE_GROUP="centreon-gorgone"
+EOF
+
+./install.sh -i -f ${DL_DIR}/${GORGONE_TMPL} >> ${INSTALL_LOG}
+
+	
 }
 
 function create_centreon_tmpl() {
@@ -523,6 +631,7 @@ CENTREON_ETC="/etc/centreon"
 CENTREON_RUNDIR="/var/run/centreon"
 CENTREON_GENDIR="/var/cache/centreon"
 CENTSTORAGE_RRD="/var/lib/centreon"
+CENTREON_CACHEDIR="/var/cache/centreon"
 CENTSTORAGE_BINDIR="${INSTALL_DIR}/centreon/bin"
 CENTCORE_BINDIR="${INSTALL_DIR}/centreon/bin"
 CENTREON_VARLIB="/var/lib/centreon"
@@ -583,6 +692,11 @@ PEAR_PATH="/usr/share/php/"
 PHP_FPM_SERVICE="php7.3-fpm"
 PHP_FPM_RELOAD=1
 DIR_PHP_FPM_CONF="/etc/php/7.3/fpm/pool.d/"
+
+GORGONE_VARLIB="/var/lib/centreon-gorgone"
+GORGONE_CONFIG="/etc/centreon-gorgone"
+GORGONE_USER="centreon-gorgone"
+GORGONE_GROUP="centreon-gorgone"
 EOF
 }
 
@@ -595,16 +709,25 @@ function centreon_maj () {
 
 cd ${DL_DIR}
 
-if [[ -e centreon-web-${CENTREON_VER}.tar.gz ]]
+if [[ ${CENTREON_VER[1]} == "1" ]]; then
+  PREFIXTAR=""
+  PREFIX="centreon-"
+else
+  PREFIXTAR="centreon-web-"
+  PREFIX="centreon-web-"
+fi
+
+
+if [[ -e ${PREFIX}${CENTREON_VER[0]}.tar.gz ]]
   then
     echo 'File already exist!' | tee -a ${INSTALL_LOG}
   else
-    wget ${CENTREON_URL} -O ${DL_DIR}/centreon-web-${CENTREON_VER}.tar.gz >> ${INSTALL_LOG}
+    wget ${CENTREON_URL} -O ${DL_DIR}/${PREFIXTAR}${CENTREON_VER[0]}.tar.gz >> ${INSTALL_LOG}
     [ $? != 0 ] && return 1
 fi
 
-tar xzf centreon-web-${CENTREON_VER}.tar.gz
-cd ${DL_DIR}/centreon-web-${CENTREON_VER}
+tar xzf ${PREFIXTAR}${CENTREON_VER[0]}.tar.gz
+cd ${DL_DIR}/${PREFIX}${CENTREON_VER[0]}
 
 
 # clean /tmp
@@ -645,19 +768,22 @@ sed -i -e "s/mibs/#mibs/g" /etc/snmp/snmp.conf;
 systemctl daemon-reload >> ${INSTALL_LOG}
 systemctl restart snmpd snmptrapd >> ${INSTALL_LOG}
 
-# make lib perl rrd
-cd ${DL_DIR}/rrdtool-1.4.7/bindings/perl-shared
-perl Makefile.PL >> ${INSTALL_LOG}
-make test >> ${INSTALL_LOG}
-make install >> ${INSTALL_LOG}
 
 cd ${DL_DIR}
 
-if [[ -e centreon-web-${CENTREON_VER}.tar.gz ]]
+if [[ ${CENTREON_VER[1]} == "1" ]]; then
+  PREFIXTAR=""
+  PREFIX="centreon-"
+else
+  PREFIXTAR="centreon-web-"
+  PREFIX="centreon-web-"
+fi
+
+if [[ -e ${PREFIX}${CENTREON_VER[0]}.tar.gz ]]
   then
     echo 'File already exist!' | tee -a ${INSTALL_LOG}
   else
-    wget ${CENTREON_URL} -O ${DL_DIR}/centreon-web-${CENTREON_VER}.tar.gz >> ${INSTALL_LOG}
+    wget ${CENTREON_URL} -O ${DL_DIR}/${PREFIXTAR}${CENTREON_VER[0]}.tar.gz >> ${INSTALL_LOG}
     [ $? != 0 ] && return 1
 fi
 
@@ -665,8 +791,8 @@ groupadd -g 6000 ${CENTREON_GROUP}
 useradd -u 6000 -g ${CENTREON_GROUP} -m -r -d /var/lib/centreon -c "Centreon Web user" -s /bin/bash ${CENTREON_USER}
 usermod -aG ${CENTREON_GROUP} ${ENGINE_USER}
 
-tar xzf centreon-web-${CENTREON_VER}.tar.gz
-cd ${DL_DIR}/centreon-web-${CENTREON_VER}
+tar xzf ${PREFIXTAR}${CENTREON_VER[0]}.tar.gz
+cd ${DL_DIR}/${PREFIX}${CENTREON_VER[0]}
 
 
 # clean /tmp
@@ -690,16 +816,20 @@ apt-get install curl  >> ${INSTALL_LOG}
 curl -sL https://deb.nodesource.com/setup_12.x | bash - >> ${INSTALL_LOG}
 apt-get install -y nodejs >> ${INSTALL_LOG}
 
+
 #build javascript dependencies
-npm install >> ${INSTALL_LOG}
+npm ci >> ${INSTALL_LOG}
 npm run build >> ${INSTALL_LOG}
+
+# remplace script install.sh
+cp ${DIR_SCRIPT}/libinstall/install_web.sh ${DL_DIR}/${PREFIX}${CENTREON_VER[0]}/install.sh >> ${INSTALL_LOG}
 
 
 if [ "$INSTALL_WEB" == "yes" ]
 then
   [ "$SCRIPT_VERBOSE" = true ] && echo " Apply Centreon template " | tee -a ${INSTALL_LOG}
 
-  ./install.sh -i -f ${DL_DIR}/${CENTREON_TMPL} >> ${INSTALL_LOG}
+  /usr/bin/bash ${DL_DIR}/${PREFIX}${CENTREON_VER[0]}/install.sh -i -f ${DL_DIR}/${CENTREON_TMPL} >> ${INSTALL_LOG}
 fi 
 }
 
@@ -710,14 +840,6 @@ function post_install () {
 =====================================================================
 " | tee -a ${INSTALL_LOG}
 
-#bug fix 
-sed -i -e 's/@PHP_BIN@/\/usr\/bin\/php/g' ${INSTALL_DIR}/centreon/bin/centreon
-sed -i -e 's/@PHP_BIN@/\/usr\/bin\/php/g' ${INSTALL_DIR}/centreon/bin/export-mysql-indexes
-sed -i -e 's/@PHP_BIN@/\/usr\/bin\/php/g' ${INSTALL_DIR}/centreon/bin/generateSqlLite
-sed -i -e 's/@PHP_BIN@/\/usr\/bin\/php/g' ${INSTALL_DIR}/centreon/bin/import-mysql-indexes
-sed -i -e 's/@PHP_BIN@/\/usr\/bin\/php/g' ${INSTALL_DIR}/centreon/cron/centreon-backup.pl
-sed -i -e 's/@PHP_BIN@/\/usr\/bin\/php/g' ${INSTALL_DIR}/centreon/cron/centAcl.php
-sed -i -e 's/@PHP_BIN@/\/usr\/bin\/php/g' ${INSTALL_DIR}/centreon/cron/downtimeManager.php
 
 #Modify default config
 # Monitoring engine information
@@ -730,34 +852,11 @@ sed -i -e "s/lib64\/nagios\/cbmod.so/lib\/centreon-broker\/cbmod.so/g" ${INSTALL
 # sed -i -e "s/CENTREONPLUGINS/CENTREON_PLUGINS/g" ${INSTALL_DIR}/centreon/www/install/steps/functions.php;
 sed -i -e "s/centreon_plugins'] = \"\"/centreon_plugins'] = \"\/usr\/lib\/centreon\/plugins\"/g" ${INSTALL_DIR}/centreon/www/install/install.conf.php;
 
-# bug goup centreon-engine 
+# bug group centreon-engine 
 /usr/sbin/usermod -aG ${ENGINE_GROUP} ${BROKER_USER}
 /usr/sbin/usermod -aG ${ENGINE_GROUP} www-data
 /usr/sbin/usermod -aG ${ENGINE_GROUP} ${CENTREON_USER}
-
-# Add mysql config for Centreon
-cat >  /etc/mysql/conf.d/centreon.cnf << EOF
-[mysqld]
-innodb_file_per_table=1
-open_files_limit=32000
-sql_mode='ERROR_FOR_DIVISION_BY_ZERO,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION'
-EOF
-
-# Modifiy config systemd
-sed -i -e "s/LimitNOFILE=16364/LimitNOFILE=32000/g" /lib/systemd/system/mariadb.service;
-
-systemctl daemon-reload >> ${INSTALL_LOG}
-systemctl restart mysql >> ${INSTALL_LOG}
-
-/usr/bin/mysql <<EOF
-use mysql;
-update user set plugin='' where user='root';
-flush privileges;
-EOF
-
-# add Timezone
-VARTIMEZONEP=`echo ${VARTIMEZONE} | sed 's:\/:\\\/:g' `
-sed -i -e "s/;date.timezone =/date.timezone = ${VARTIMEZONEP}/g" /etc/php/7.3/fpm/php.ini
+/usr/sbin/usermod -aG ${ENGINE_GROUP} centreon-gorgone
 
 
 # reload conf apache
@@ -769,6 +868,49 @@ systemctl restart apache2 php7.3-fpm >> ${INSTALL_LOG}
 ## (mode w+): Permission denied)
 chmod 775 /var/lib/centreon/centplugins
 chown ${CENTREON_USER}:${CENTREON_USER} /var/lib/centreon/centplugins
+
+##bugfix create centcore for send external command to Poller
+mkdir /var/lib/centreon/centcore
+chown ${CENTREON_USER}:${CENTREON_USER} /var/lib/centreon/centcore
+chmod 775 /var/lib/centreon/centcore
+
+# configure gorgone
+[ "$SCRIPT_VERBOSE" = true ] && echo "====> Configure gorgone" | tee -a ${INSTALL_LOG}
+cat > /etc/centreon/config.yaml <<EOF
+name: config.yaml
+description: Configuration for Central server
+configuration: !include config.d/*.yaml
+EOF
+chmod 664 /etc/centreon/config.yaml
+chown centreon: /etc/centreon/config.yaml
+
+chmod 775 /etc/centreon/config.d
+chown centreon: /etc/centreon/config.d
+
+cat > /etc/centreon/config.d/10-database.yaml <<EOF
+database:
+  db_configuration:
+    dsn: "mysql:host=localhost:3306;dbname=centreon"
+    username: "centreon"
+    password: "centreon"
+  db_realtime:
+    dsn: "mysql:host=localhost:3306;dbname=centreon_storage"
+    username: "centreon"
+    password: "centreon"
+EOF
+
+chown www-data: /etc/centreon/config.d/10-database.yaml
+
+cat > /etc/centreon-gorgone/config.d/30-centreon.yaml <<EOF
+name: centreon.yaml
+description: Configure Centreon Gorgone to work with Centreon Web.
+centreon: !include /etc/centreon/config.d/*.yaml
+EOF
+
+# bugfix nodes gorgone
+sed -i -e "s/unshift \$register_subnodes->{\$_->\[0\]}/unshift \@{\$register_subnodes->{\$_->\[0\]}}/g" /usr/share/perl5/gorgone/modules/centreon/nodes/class.pm
+
+systemctl restart gorgoned
 
 #add cgroup centreon
 echo '[Unit]
@@ -858,6 +1000,9 @@ if [[ $? -eq 1 ]]; then
   maj_conf "WIDGET_GRAPH" "$WIDGET_GRAPH_VER_OLD" "$WIDGET_GRAPH_VER"
 fi
   chown -R ${CENTREON_USER}:${CENTREON_GROUP} ${INSTALL_DIR}/centreon/www/widgets
+  
+  #bug fix tactical-overview
+  sed -i -e "s/\$res = \$db->query(\$queryPEND);/#\$res = \$db->query(\$queryPEND);/g" ${INSTALL_DIR}/centreon/www/widgets/tactical-overview/src/hosts_status.php
 }
 
 function add_check_nrpe() {
@@ -893,12 +1038,13 @@ function main () {
 echo "
 ================| Centreon Central Install details $VERSION_BATCH |============
                   MariaDB    : ${MARIADB_VER}
-                  Clib       : ${CLIB_VER}
-                  Connector  : ${CONNECTOR_VER}
-                  Engine     : ${ENGINE_VER}
-                  Plugins    : ${PLUGIN_VER} & ${PLUGIN_CENTREON_VER}
-                  Broker     : ${BROKER_VER}
-                  Centreon   : ${CENTREON_VER}
+                  Clib       : ${CLIB_VER[0]}
+                  Connector  : ${CONNECTOR_VER[0]}
+                  Engine     : ${ENGINE_VER[0]}
+                  Plugins    : ${PLUGIN_VER} & ${PLUGIN_CENTREON_VER[0]}
+                  Broker     : ${BROKER_VER[0]}
+                  Gorgone    : ${GORGONE_VER[0]}
+                  Centreon   : ${CENTREON_VER[0]}
                   NRPE       : ${NRPE_VERSION}
                   Install dir: ${INSTALL_DIR}
                   Source dir : ${DL_DIR}
@@ -908,12 +1054,13 @@ echo "
 echo "
 ================| Centreon Central Install details $VERSION_BATCH |============
                   MariaDB    : ${MARIADB_VER}
-                  Clib       : ${CLIB_VER}
-                  Connector  : ${CONNECTOR_VER}
-                  Engine     : ${ENGINE_VER}
-                  Plugins    : ${PLUGIN_VER} & ${PLUGIN_CENTREON_VER}
-                  Broker     : ${BROKER_VER}
-                  Centreon   : ${CENTREON_VER}
+                  Clib       : ${CLIB_VER[0]}
+                  Connector  : ${CONNECTOR_VER[0]}
+                  Engine     : ${ENGINE_VER[0]}
+                  Plugins    : ${PLUGIN_VER} & ${PLUGIN_CENTREON_VER[0]}
+                  Broker     : ${BROKER_VER[0]}
+                  Gorgone    : ${GORGONE_VER[0]}
+                  Centreon   : ${CENTREON_VER[0]}
                   Install dir: ${INSTALL_DIR}
                   Source dir : ${DL_DIR}
 ======================================================================
@@ -937,7 +1084,7 @@ if [[ $? -ne 0 ]];
     echo -e "${bold}Step2${normal}  => MariaDB Install                                       ${STATUS_OK}"
 fi
 
-verify_version "$CLIB_VER" "$CLIB_VER_OLD"
+verify_version "$CLIB_VER[0]" "$CLIB_VER_OLD"
 if [[ $? -eq 1 ]];
   then
     clib_install 2>>${INSTALL_LOG}
@@ -946,14 +1093,14 @@ if [[ $? -eq 1 ]];
         echo -e "${bold}Step3${normal}  => Clib install                                          ${STATUS_FAIL}"
       else
         echo -e "${bold}Step3${normal}  => Clib install                                          ${STATUS_OK}"
-        maj_conf "CLIB_VER" "$CLIB_VER_OLD" "$CLIB_VER"
+        maj_conf "CLIB_VER[0]" "$CLIB_VER_OLD" "$CLIB_VER[0]"
     fi
   else
     echo -e "${bold}Step3${normal}  => Clib already installed                                ${STATUS_OK}"
 fi
 
 
-verify_version "$CONNECTOR_VER" "$CONNECTOR_VER_OLD"
+verify_version "$CONNECTOR_VER[0]" "$CONNECTOR_VER_OLD"
 if [[ $? -eq 1 ]];
   then
     centreon_connectors_install 2>>${INSTALL_LOG}
@@ -962,13 +1109,13 @@ if [[ $? -eq 1 ]];
         echo -e "${bold}Step4${normal}  => Centreon Perl and SSH connectors install              ${STATUS_FAIL}"
       else
         echo -e "${bold}Step4${normal}  => Centreon Perl and SSH connectors install              ${STATUS_OK}"
-        maj_conf "CONNECTOR_VER" "$CONNECTOR_VER_OLD" "$CONNECTOR_VER"
+        maj_conf "CONNECTOR_VER[0]" "$CONNECTOR_VER_OLD" "$CONNECTOR_VER[0]"
     fi
   else
     echo -e  "${bold}Step4${normal}  => Centreon Perl and SSH connectors already installed    ${STATUS_OK}"
 fi
 
-verify_version "$ENGINE_VER" "$ENGINE_VER_OLD"
+verify_version "$ENGINE_VER[0]" "$ENGINE_VER_OLD"
 if [[ $? -eq 1 ]];
   then
     if [ ! -z "$ENGINE_VER_OLD" ]; then
@@ -980,7 +1127,7 @@ if [[ $? -eq 1 ]];
         echo -e "${bold}Step5${normal}  => Centreon Engine install                               ${STATUS_FAIL}"
       else
         echo -e "${bold}Step5${normal}  => Centreon Engine install                               ${STATUS_OK}"
-        maj_conf "ENGINE_VER" "$ENGINE_VER_OLD" "$ENGINE_VER"
+        maj_conf "ENGINE_VER[0]" "$ENGINE_VER_OLD" "$ENGINE_VER[0]"
     fi
   else
     echo -e     "${bold}Step5${normal}  => Centreon Engine already installed                     ${STATUS_OK}"
@@ -1001,7 +1148,7 @@ if [[ $? -eq 1 ]];
     echo -e     "${bold}Step6${normal}  => Monitoring plugins already installed                  ${STATUS_OK}"
 fi
 
-verify_version "$PLUGIN_CENTREON_VER" "$PLUGIN_CENTREON_VER_OLD"
+verify_version "$PLUGIN_CENTREON_VER[0]" "$PLUGIN_CENTREON_VER_OLD"
 if [[ $? -eq 1 ]];
   then
     centreon_plugins_install 2>>${INSTALL_LOG}
@@ -1010,14 +1157,14 @@ if [[ $? -eq 1 ]];
         echo -e "${bold}Step7${normal}  => Centreon plugins install                              ${STATUS_FAIL}"
       else
         echo -e   "${bold}Step7${normal}  => Centreon plugins install                              ${STATUS_OK}"
-        maj_conf "PLUGIN_CENTREON_VER" "$PLUGIN_CENTREON_VER_OLD" "$PLUGIN_CENTREON_VER"    
+        maj_conf "PLUGIN_CENTREON_VER[0]" "$PLUGIN_CENTREON_VER_OLD" "$PLUGIN_CENTREON_VER[0]"    
     fi
   else
     echo -e     "${bold}Step7${normal}  => Centreon plugins already installed                    ${STATUS_OK}"
 fi
 
 
-verify_version "$BROKER_VER" "$BROKER_VER_OLD"
+verify_version "$BROKER_VER[0]" "$BROKER_VER_OLD"
 if [[ $? -eq 1 ]];
   then
     if [ ! -z "$BROKER_VER_OLD" ]; then
@@ -1030,14 +1177,13 @@ if [[ $? -eq 1 ]];
         echo -e "${bold}Step8${normal}  => Centreon Broker install                               ${STATUS_FAIL}"
       else
         echo -e "${bold}Step8${normal}  => Centreon Broker install                               ${STATUS_OK}"
-        maj_conf "BROKER_VER" "$BROKER_VER_OLD" "$BROKER_VER"    
+        maj_conf "BROKER_VER[0]" "$BROKER_VER_OLD" "$BROKER_VER[0]"    
     fi
   else
     echo -e     "${bold}Step8${normal}  => Centreon Broker already installed                     ${STATUS_OK}"
 fi
 
-
-verify_version "$CENTREON_VER" "$CENTREON_VER_OLD"
+verify_version "$CENTREON_VER[0]" "$CENTREON_VER_OLD"
 if [[ $? -eq 1 ]];
   then
     php_fpm_install 2>>${INSTALL_LOG}
@@ -1051,8 +1197,24 @@ if [[ $? -eq 1 ]];
     echo -e   "${bold}Step9${normal}  => Php-fpm already installed                             ${STATUS_OK}"
 fi
 
+verify_version "$GORGONE_VER[0]" "$GORGONE_VER_OLD"
+if [[ $? -eq 1 ]];
+  then
+    centreon_gorgone_install 2>>${INSTALL_LOG}
+    if [[ $? -ne 0 ]];
+      then
+        echo -e "${bold}Step10${normal} => Centreon Gorgone install                              ${STATUS_FAIL}"
+      else
+        echo -e "${bold}Step10${normal} => Centreon Gorgone install                              ${STATUS_OK}"
+        maj_conf "GORGONE_VER[0]" "$GORGONE_VER_OLD" "$GORGONE_VER[0]"    
+    fi
+  else
+    echo -e     "${bold}Step10${normal} => Centreon Gorgone already installed                     ${STATUS_OK}"
+fi
 
-verify_version "$CENTREON_VER" "$CENTREON_VER_OLD"
+
+
+verify_version "$CENTREON_VER[0]" "$CENTREON_VER_OLD"
 if [[ $? -eq 1 ]];
   then
     if [ -z "$CENTREON_VER_OLD" ]; 
@@ -1060,20 +1222,20 @@ if [[ $? -eq 1 ]];
       create_centreon_tmpl 2>>${INSTALL_LOG}
       if [[ $? -ne 0 ]];
       then
-        echo -e "${bold}Step10${normal}  => Centreon template generation                          ${STATUS_FAIL}"
+        echo -e "${bold}Step11${normal} => Centreon template generation                          ${STATUS_FAIL}"
       else
-        echo -e "${bold}Step10${normal}  => Centreon template generation                          ${STATUS_OK}"
+        echo -e "${bold}Step11${normal} => Centreon template generation                          ${STATUS_OK}"
       fi
     else 
       create_centreon_tmpl 2>>${INSTALL_LOG}
-      echo -e "${bold}Step10${normal}  => Centreon template generation                          ${STATUS_OK}"
+      echo -e "${bold}Step11${normal} => Centreon template generation                          ${STATUS_OK}"
     fi
   else
-    echo -e   "${bold}Step10${normal}  => Centreon template already installed                   ${STATUS_OK}"
+    echo -e   "${bold}Step11${normal}  => Centreon template already installed                   ${STATUS_OK}"
 fi
 
 
-verify_version "$CENTREON_VER" "$CENTREON_VER_OLD"
+verify_version "$CENTREON_VER[0]" "$CENTREON_VER_OLD"
 if [[ $? -eq 1 ]];
   then
     if [ -z "$CENTREON_VER_OLD" ]; 
@@ -1081,23 +1243,23 @@ if [[ $? -eq 1 ]];
       centreon_install 2>>${INSTALL_LOG}
       if [[ $? -ne 0 ]];
       then
-        echo -e "${bold}Step11${normal}  => Centreon web interface install                        ${STATUS_FAIL}"
+        echo -e "${bold}Step12${normal} => Centreon web interface install                        ${STATUS_FAIL}"
       else
-        echo -e "${bold}Step11${normal}  => Centreon web interface install                        ${STATUS_OK}"
-        maj_conf "CENTREON_VER" "$CENTREON_VER_OLD" "$CENTREON_VER"    
+        echo -e "${bold}Step12${normal} => Centreon web interface install                        ${STATUS_OK}"
+        maj_conf "CENTREON_VER[0]" "$CENTREON_VER_OLD" "$CENTREON_VER[0]"    
       fi
     else 
       centreon_maj 2>>${INSTALL_LOG}
       if [[ $? -ne 0 ]];
       then
-        echo -e "${bold}Step11${normal}  => Centreon web interface maj                            ${STATUS_FAIL}"
+        echo -e "${bold}Step12${normal} => Centreon web interface maj                            ${STATUS_FAIL}"
       else
-        echo -e "${bold}Step11${normal}  => Centreon web interface maj                           ${STATUS_OK}"
-        maj_conf "CENTREON_VER" "$CENTREON_VER_OLD" "$CENTREON_VER"    
+        echo -e "${bold}Step12${normal} => Centreon web interface maj                           ${STATUS_OK}"
+        maj_conf "CENTREON_VER[0]" "$CENTREON_VER_OLD" "$CENTREON_VER[0]"    
       fi
     fi
   else
-    echo -e   "${bold}Step11${normal}  => Centreon web already installed                   ${STATUS_OK}"
+    echo -e   "${bold}Step12${normal} => Centreon web already installed                   ${STATUS_OK}"
 fi
 
 
@@ -1108,9 +1270,9 @@ then
     post_install 2>>${INSTALL_LOG}
     if [[ $? -ne 0 ]];
     then
-      echo -e "${bold}Step12${normal} => Post install                                          ${STATUS_FAIL}"
+      echo -e "${bold}Step13${normal} => Post install                                          ${STATUS_FAIL}"
     else
-      echo -e "${bold}Step12${normal} => Post install                                          ${STATUS_OK}"
+      echo -e "${bold}Step13${normal} => Post install                                          ${STATUS_OK}"
     fi
   fi
 fi
@@ -1121,9 +1283,9 @@ then
   widget_install 2>>${INSTALL_LOG}
   if [[ $? -ne 0 ]];
     then
-      echo -e "${bold}Step13${normal} => Widgets install                                       ${STATUS_FAIL}"
+      echo -e "${bold}Step14${normal} => Widgets install                                       ${STATUS_FAIL}"
     else
-      echo -e "${bold}Step13${normal} => Widgets install                                       ${STATUS_OK}"
+      echo -e "${bold}Step14${normal} => Widgets install                                       ${STATUS_OK}"
   fi
 fi 
 
@@ -1132,9 +1294,9 @@ then
   add_check_nrpe 2>>${INSTALL_LOG}
   if [[ $? -ne 0 ]];
   then
-    echo -e "${bold}Step14${normal} => Nrpe install                                          ${STATUS_FAIL}"
+    echo -e "${bold}Step15${normal} => Nrpe install                                          ${STATUS_FAIL}"
   else
-    echo -e "${bold}Step14${normal} => Nrpe install                                          ${STATUS_OK}"
+    echo -e "${bold}Step15${normal} => Nrpe install                                          ${STATUS_OK}"
   fi
 
 fi

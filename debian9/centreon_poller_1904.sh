@@ -1,20 +1,20 @@
 #!/bin/bash
 # Centreon poller install script for Debian Stretch
-# v 1.34
-# 25/10/2019
+# v 1.46
+# 24/03/2020
 # Thanks to Remy
 #
 export DEBIAN_FRONTEND=noninteractive
 # Variables
 ## Versions
-VERSION_BATCH="v 1.34"
-CLIB_VER="19.04.0"
-CONNECTOR_VER="19.04.0"
-ENGINE_VER="19.04.1"
+VERSION_BATCH="v 1.46"
+CLIB_VER="19.04.1"
+CONNECTOR_VER="19.04.1"
+ENGINE_VER="19.04.3"
 PLUGIN_VER="2.2"
-PLUGIN_CENTREON_VER="20191016"
+PLUGIN_CENTREON_VER="20200204"
 BROKER_VER="19.04.0"
-CENTREON_VER="19.04.4"
+CENTREON_VER="19.04.11"
 # MariaDB Series
 MARIADB_VER='10.0'
 ## Sources URL

@@ -1,20 +1,20 @@
 #!/bin/bash
 # Centreon 19.04 + engine install script for Debian Stretch
-# v 1.34
-# 25/10/2019
+# v 1.48
+# 04/04/2020
 # Thanks to Remy
 #
 export DEBIAN_FRONTEND=noninteractive
 # Variables
 ## Versions
-VERSION_BATCH="v 1.34"
-CLIB_VER="19.04.0"
-CONNECTOR_VER="19.04.0"
-ENGINE_VER="19.04.1"
+VERSION_BATCH="v 1.48"
+CLIB_VER="19.04.1"
+CONNECTOR_VER="19.04.1"
+ENGINE_VER="19.04.3"
 PLUGIN_VER="2.2"
-PLUGIN_CENTREON_VER="20191016"
+PLUGIN_CENTREON_VER="20200204"
 BROKER_VER="19.04.0"
-CENTREON_VER="19.04.4"
+CENTREON_VER="19.04.11"
 # MariaDB Series
 MARIADB_VER='10.0'
 ## Sources URL
@@ -28,17 +28,17 @@ BROKER_URL="${BASE_URL}/centreon-broker/centreon-broker-${BROKER_VER}.tar.gz"
 CENTREON_URL="${BASE_URL}/centreon/centreon-web-${CENTREON_VER}.tar.gz"
 CLAPI_URL="${BASE_URL}/Modules/CLAPI/centreon-clapi-${CLAPI_VER}.tar.gz"
 ## Sources widgetsMonitoring engine init.d script
-WIDGET_HOST_VER="19.04.1"
-WIDGET_HOSTGROUP_VER="19.04.0"
-WIDGET_SERVICE_VER="19.04.2"
-WIDGET_SERVICEGROUP_VER="19.04.0"
-WIDGET_GRID_MAP_VER="19.04.0"
-WIDGET_TOP_CPU_VER="19.04.0"
-WIDGET_TOP_MEMORY_VER="19.04.0"
-WIDGET_TACTICAL_OVERVIEW_VER="19.04.0"
-WIDGET_HTTP_LOADER_VER="19.04.0"
-WIDGET_ENGINE_STATUS_VER="19.04.0"
-WIDGET_GRAPH_VER="19.04.0"
+WIDGET_HOST_VER="19.04.3"
+WIDGET_HOSTGROUP_VER="19.04.1"
+WIDGET_SERVICE_VER="19.04.3"
+WIDGET_SERVICEGROUP_VER="19.04.1"
+WIDGET_GRID_MAP_VER="19.04.1"
+WIDGET_TOP_CPU_VER="19.04.2"
+WIDGET_TOP_MEMORY_VER="19.04.1"
+WIDGET_TACTICAL_OVERVIEW_VER="19.04.1"
+WIDGET_HTTP_LOADER_VER="19.04.1"
+WIDGET_ENGINE_STATUS_VER="19.04.2"
+WIDGET_GRAPH_VER="19.04.1"
 WIDGET_BASE="http://files.download.centreon.com/public/centreon-widgets"
 WIDGET_HOST="${WIDGET_BASE}/centreon-widget-host-monitoring/centreon-widget-host-monitoring-${WIDGET_HOST_VER}.tar.gz"
 WIDGET_HOSTGROUP="${WIDGET_BASE}/centreon-widget-hostgroup-monitoring/centreon-widget-hostgroup-monitoring-${WIDGET_HOSTGROUP_VER}.tar.gz"
@@ -147,7 +147,7 @@ if [[ -e centreon-clib-${CLIB_VER}.tar.gz ]] ;
 fi
 
 tar xzf centreon-clib-${CLIB_VER}.tar.gz
-cd centreon-clib-${CLIB_VER}/build
+cd centreon-clib-${CLIB_VER}
 
 [ "$SCRIPT_VERBOSE" = true ] && echo "====> Compilation" | tee -a ${INSTALL_LOG}
 
@@ -685,7 +685,7 @@ composer install --no-dev --optimize-autoloader  >> ${INSTALL_LOG}
 
 # add node-js
 apt-get install curl  >> ${INSTALL_LOG}
-curl -sL https://deb.nodesource.com/setup_8.x | bash - >> ${INSTALL_LOG}
+curl -sL https://deb.nodesource.com/setup_12.x | bash - >> ${INSTALL_LOG}
 apt-get install -y nodejs >> ${INSTALL_LOG}
 
 #build javascript dependencies
@@ -713,6 +713,9 @@ sed -i -e 's/@PHP_BIN@/\/usr\/bin\/php/g' ${INSTALL_DIR}/centreon/bin/centreon
 sed -i -e 's/@PHP_BIN@/\/usr\/bin\/php/g' ${INSTALL_DIR}/centreon/bin/export-mysql-indexes
 sed -i -e 's/@PHP_BIN@/\/usr\/bin\/php/g' ${INSTALL_DIR}/centreon/bin/generateSqlLite
 sed -i -e 's/@PHP_BIN@/\/usr\/bin\/php/g' ${INSTALL_DIR}/centreon/bin/import-mysql-indexes
+sed -i -e 's/@PHP_BIN@/\/usr\/bin\/php/g' ${INSTALL_DIR}/centreon/cron/centreon-backup.pl
+sed -i -e 's/@PHP_BIN@/\/usr\/bin\/php/g' ${INSTALL_DIR}/centreon/cron/centAcl.php
+sed -i -e 's/@PHP_BIN@/\/usr\/bin\/php/g' ${INSTALL_DIR}/centreon/cron/downtimeManager.php
 
 #Modify default config
 # Monitoring engine information

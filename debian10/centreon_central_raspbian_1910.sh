@@ -1,26 +1,26 @@
 #!/bin/bash
 # Centreon 19.10 + engine install script for Raspian Buster
-# v 1.41
-# 05/12/2019
+# v 1.48
+# 04/04/2020
 # Thanks to Remy, Justice81 and Pixelabs
 #
 export DEBIAN_FRONTEND=noninteractive
 # Variables
 ## Versions
-VERSION_BATCH="v 1.41"
+VERSION_BATCH="v 1.48"
 CLIB_VER="19.10.0"
-CONNECTOR_VER="19.10.0"
-ENGINE_VER="19.10.7"
+CONNECTOR_VER="19.10.1"
+ENGINE_VER="19.10.13"
 PLUGIN_VER="2.2"
-PLUGIN_CENTREON_VER="20191016"
-BROKER_VER="19.10.1"
-CENTREON_VER="19.10.3"
+PLUGIN_CENTREON_VER="20200204"
+BROKER_VER="19.10.3"
+CENTREON_VER="19.10.10"
 # MariaDB Series
 MARIADB_VER='10.0'
 ## Sources URL
 BASE_URL="http://files.download.centreon.com/public"
 CLIB_URL="${BASE_URL}/centreon-clib/centreon-clib-${CLIB_VER}.tar.gz"
-CONNECTOR_URL="${BASE_URL}/centreon-connectors/centreon-connector-${CONNECTOR_VER}.tar.gz"
+CONNECTOR_URL="${BASE_URL}/centreon-connectors/centreon-connectors-${CONNECTOR_VER}.tar.gz"
 ENGINE_URL="${BASE_URL}/centreon-engine/centreon-engine-${ENGINE_VER}.tar.gz"
 PLUGIN_URL="https://www.monitoring-plugins.org/download/monitoring-plugins-${PLUGIN_VER}.tar.gz"
 PLUGIN_CENTREON_URL="${BASE_URL}/centreon-plugins/centreon-plugins-${PLUGIN_CENTREON_VER}.tar.gz"
@@ -28,17 +28,17 @@ BROKER_URL="${BASE_URL}/centreon-broker/centreon-broker-${BROKER_VER}.tar.gz"
 CENTREON_URL="${BASE_URL}/centreon/centreon-web-${CENTREON_VER}.tar.gz"
 CLAPI_URL="${BASE_URL}/Modules/CLAPI/centreon-clapi-${CLAPI_VER}.tar.gz"
 ## Sources widgetsMonitoring engine init.d script
-WIDGET_HOST_VER="19.10.0"
-WIDGET_HOSTGROUP_VER="19.10.0"
-WIDGET_SERVICE_VER="19.10.1"
-WIDGET_SERVICEGROUP_VER="19.10.0"
-WIDGET_GRID_MAP_VER="19.10.0"
-WIDGET_TOP_CPU_VER="19.10.0"
-WIDGET_TOP_MEMORY_VER="19.10.0"
-WIDGET_TACTICAL_OVERVIEW_VER="19.10.0"
-WIDGET_HTTP_LOADER_VER="19.10.0"
-WIDGET_ENGINE_STATUS_VER="19.10.0"
-WIDGET_GRAPH_VER="19.10.0"
+WIDGET_HOST_VER="19.10.1"
+WIDGET_HOSTGROUP_VER="19.10.1"
+WIDGET_SERVICE_VER="19.10.2"
+WIDGET_SERVICEGROUP_VER="19.10.1"
+WIDGET_GRID_MAP_VER="19.10.1"
+WIDGET_TOP_CPU_VER="19.10.1"
+WIDGET_TOP_MEMORY_VER="19.10.1"
+WIDGET_TACTICAL_OVERVIEW_VER="19.10.1"
+WIDGET_HTTP_LOADER_VER="19.10.1"
+WIDGET_ENGINE_STATUS_VER="19.10.1"
+WIDGET_GRAPH_VER="19.10.1"
 WIDGET_BASE="http://files.download.centreon.com/public/centreon-widgets"
 WIDGET_HOST="${WIDGET_BASE}/centreon-widget-host-monitoring/centreon-widget-host-monitoring-${WIDGET_HOST_VER}.tar.gz"
 WIDGET_HOSTGROUP="${WIDGET_BASE}/centreon-widget-hostgroup-monitoring/centreon-widget-hostgroup-monitoring-${WIDGET_HOSTGROUP_VER}.tar.gz"
@@ -159,21 +159,21 @@ function centreon_connectors_install () {
 apt-get install -y libperl-dev >> ${INSTALL_LOG}
 
 cd ${DL_DIR}
-if [[ -e centreon-connector-${CONNECTOR_VER}.tar.gz ]]
+if [[ -e centreon-connectors-${CONNECTOR_VER}.tar.gz ]]
   then
     echo 'File already exist !' | tee -a ${INSTALL_LOG}
   else
-    wget ${CONNECTOR_URL} -O ${DL_DIR}/centreon-connector-${CONNECTOR_VER}.tar.gz >> ${INSTALL_LOG}
+    wget ${CONNECTOR_URL} -O ${DL_DIR}/centreon-connectors-${CONNECTOR_VER}.tar.gz >> ${INSTALL_LOG}
     [ $? != 0 ] && return 1
 fi
 
-tar xzf centreon-connector-${CONNECTOR_VER}.tar.gz
-cd ${DL_DIR}/centreon-connector-${CONNECTOR_VER}/perl/build
+tar xzf centreon-connectors-${CONNECTOR_VER}.tar.gz
+cd ${DL_DIR}/centreon-connectors-${CONNECTOR_VER}/perl/build
 
 [ "$SCRIPT_VERBOSE" = true ] && echo "====> Compilation" | tee -a ${INSTALL_LOG}
 
 # add directive compilation
-sed -i '27i\set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++98 -fpermissive")' ${DL_DIR}/centreon-connector-${CONNECTOR_VER}/perl/build/CMakeLists.txt
+sed -i '27i\set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++98 -fpermissive")' ${DL_DIR}/centreon-connectors-${CONNECTOR_VER}/perl/build/CMakeLists.txt
 
 cmake \
  -DWITH_PREFIX=/usr  \
@@ -194,12 +194,12 @@ apt-get install -y libssh2-1-dev libgcrypt-dev >> ${INSTALL_LOG}
 # Cleanup to prevent space full on /var
 apt-get clean >> ${INSTALL_LOG}
 
-cd ${DL_DIR}/centreon-connector-${CONNECTOR_VER}/ssh/build
+cd ${DL_DIR}/centreon-connectors-${CONNECTOR_VER}/ssh/build
 
 [ "$SCRIPT_VERBOSE" = true ] && echo "====> Compilation" | tee -a ${INSTALL_LOG}
 
 # add directive compilation
-sed -i '27i\set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++98 -fpermissive")' ${DL_DIR}/centreon-connector-${CONNECTOR_VER}/ssh/build/CMakeLists.txt
+sed -i '27i\set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++98 -fpermissive")' ${DL_DIR}/centreon-connectors-${CONNECTOR_VER}/ssh/build/CMakeLists.txt
 
 
 cmake \
@@ -647,13 +647,13 @@ apt-get install -y nodejs >> ${INSTALL_LOG}
 sed -i -e "s/19.10.0/19.10.1/g" package.json
 
 #build javascript dependencies
-npm install >> ${INSTALL_LOG}
+npm install --unsafe-perm  >> ${INSTALL_LOG}
 npm run build >> ${INSTALL_LOG}
 
-# remplace script functions for RestAPIV2
-rm ${DL_DIR}/centreon-web-${CENTREON_VER}/libinstall/functions
-cp ${DIR_SCRIPT}/libinstall/functions ${DL_DIR}/centreon-web-${CENTREON_VER}/libinstall/functions
-chmod +x ${DL_DIR}/centreon-web-${CENTREON_VER}/libinstall/functions
+# remplace script functions for RestAPIV2 version < 19.1.0.5
+#rm ${DL_DIR}/centreon-web-${CENTREON_VER}/libinstall/functions
+#cp ${DIR_SCRIPT}/libinstall/functions ${DL_DIR}/centreon-web-${CENTREON_VER}/libinstall/functions
+#chmod +x ${DL_DIR}/centreon-web-${CENTREON_VER}/libinstall/functions
 
 if [ "$INSTALL_WEB" == "yes" ]
 then
@@ -670,11 +670,15 @@ function post_install () {
 =====================================================================
 " | tee -a ${INSTALL_LOG}
 
-#bug fix 
-sed -i -e 's/@PHP_BIN@/\/usr\/bin\/php/g' ${INSTALL_DIR}/centreon/bin/centreon
-sed -i -e 's/@PHP_BIN@/\/usr\/bin\/php/g' ${INSTALL_DIR}/centreon/bin/export-mysql-indexes
-sed -i -e 's/@PHP_BIN@/\/usr\/bin\/php/g' ${INSTALL_DIR}/centreon/bin/generateSqlLite
-sed -i -e 's/@PHP_BIN@/\/usr\/bin\/php/g' ${INSTALL_DIR}/centreon/bin/import-mysql-indexes
+#bug fix version < 19.08 
+#sed -i -e 's/@PHP_BIN@/\/usr\/bin\/php/g' ${INSTALL_DIR}/centreon/bin/centreon
+#sed -i -e 's/@PHP_BIN@/\/usr\/bin\/php/g' ${INSTALL_DIR}/centreon/bin/export-mysql-indexes
+#sed -i -e 's/@PHP_BIN@/\/usr\/bin\/php/g' ${INSTALL_DIR}/centreon/bin/generateSqlLite
+#sed -i -e 's/@PHP_BIN@/\/usr\/bin\/php/g' ${INSTALL_DIR}/centreon/bin/import-mysql-indexes
+#sed -i -e 's/@PHP_BIN@/\/usr\/bin\/php/g' ${INSTALL_DIR}/centreon/cron/centreon-backup.pl
+#sed -i -e 's/@PHP_BIN@/\/usr\/bin\/php/g' ${INSTALL_DIR}/centreon/cron/downtimeManager.php
+#sed -i -e 's/@PHP_BIN@/\/usr\/bin\/php/g' ${INSTALL_DIR}/centreon/cron/centAcl.php
+
 
 #Modify default config
 # Monitoring engine information
@@ -692,8 +696,8 @@ sed -i -e "s/centreon_plugins'] = \"\"/centreon_plugins'] = \"\/usr\/lib\/centre
 /usr/sbin/usermod -aG ${ENGINE_GROUP} www-data
 /usr/sbin/usermod -aG ${ENGINE_GROUP} ${CENTREON_USER}
 
-#bug statistic centengine issue #8084
-sed -i -e 's/"-s $self->{interval}"/"-s", $self->{interval}/g' /usr/share/perl5/centreon/script/nagiosPerfTrace.pm
+#bug statistic centengine issue #8084 version < 19.10.2
+#sed -i -e 's/"-s $self->{interval}"/"-s", $self->{interval}/g' /usr/share/perl5/centreon/script/nagiosPerfTrace.pm
 
 cd ${DL_DIR}/centreon-web-${CENTREON_VER}
 # Add API key for Centreon
@@ -705,22 +709,23 @@ sed -i -e "s/%APP_SECRET%/${APIKEY}/g" .env
 #generate .env.local.php
 composer dump-env prod
 
-#Modify right cache
-chown -R ${CENTREON_USER}:${CENTREON_GROUP} /var/cache/centreon
-chmod -R 775 /var/cache/centreon
+#Modify right cache centreon < 19.10.8
+#chown -R ${CENTREON_USER}:${CENTREON_GROUP} /var/cache/centreon
+#chmod -R 775 /var/cache/centreon
 
 #copy files
 cp .env ${INSTALL_DIR}/centreon
 cp .env.local.php ${INSTALL_DIR}/centreon
-cp container.php ${INSTALL_DIR}/centreon/
-mv api ${INSTALL_DIR}/centreon/
-cp config/bootstrap.php ${INSTALL_DIR}/centreon/config/
-cp config/bundles.php ${INSTALL_DIR}/centreon/config/
-cp config/services.yaml ${INSTALL_DIR}/centreon/config/
-mv config/Modules ${INSTALL_DIR}/centreon/config/
-mv config/packages ${INSTALL_DIR}/centreon/config/
-mv config/routes ${INSTALL_DIR}/centreon/config/
-chown -R root: ${INSTALL_DIR}/centreon/config/*
+#copy files version < 19.10.5
+#cp container.php ${INSTALL_DIR}/centreon/
+#mv api ${INSTALL_DIR}/centreon/
+#cp config/bootstrap.php ${INSTALL_DIR}/centreon/config/
+#cp config/bundles.php ${INSTALL_DIR}/centreon/config/
+#cp config/services.yaml ${INSTALL_DIR}/centreon/config/
+#mv config/Modules ${INSTALL_DIR}/centreon/config/
+#mv config/packages ${INSTALL_DIR}/centreon/config/
+#mv config/routes ${INSTALL_DIR}/centreon/config/
+#chown -R root: ${INSTALL_DIR}/centreon/config/*
 
 # Add mysql config for Centreon
 cat >  /etc/mysql/conf.d/centreon.cnf << EOF

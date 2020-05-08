@@ -1,7 +1,7 @@
 # auto_install
 Automated installation of Centreon on Debian with sources
 
-See [the explanation page](http://sugarbug.fr/atelier/installations/debian/centreon-install/centreon-install_1910-Buster/)
+See [the explanation page](https://www.sugarbug.fr/atelier/installations/debian/centreon-install/centreon-install_2004-Buster/)
 
 ## tags
 git clone https://github.com/kermith72/auto_install.git
@@ -9,6 +9,44 @@ git clone https://github.com/kermith72/auto_install.git
 cd auto_install
 
 git checkout v1.x
+
+
+### version 1.49
+new scripts for 20.04.0
+
+centreon-web 20.04.0, engine 20.04, broker 20.04 an new centreon-gorgone 20.04
+
+new script create_config_initialV6.sh for plugins 20.04.0
+
+### version 1.48
+update widget for 19.04 and 19.10
+See [the explanation page](https://www.sugarbug.fr/atelier/installations/debian/centreon-install/centreon-install_1910-Buster/)
+
+### version 1.47
+centreon-web 19.10.10 and 19.04.13, centreon-engine 19.10.13, connector 19.10.1
+
+new script create_config_initialV5.sh for template windows NRPE
+
+### version 1.46
+centreon-web 19.10.08, centreon-engine 19.10.12, add template linux-remote
+
+update scripts 19.04 and 18.10 for Debian Stretch, update widget
+
+### version 1.45
+centreon-web 19.10.07 & 19.04.10, centreon-broker 19.10.3, centreon-engine 19.10.11
+
+### version 1.44
+centreon-web 19.10.6 & 19.04.9, centreon-engine 19.10.10
+
+### version 1.43
+centreon-web 19.10.5 & 19.04.8, centreon-engine 19.10.9, clib 19.04.1
+
+new script create_config_initialV5.sh for plugins 20191219 (windows and cisco)
+
+### version 1.42
+centreon-web 19.10.4 & 19.04.7, centreon-engine 19.10.8 & 19.04.2, broker 19.10.2, plugins 20191219 
+
+new script create_config_initialV5.sh for plugins 20191219
 
 ### version 1.41
 centreon-web 19.10.3 & 19.04.6, centreon-engine 19.10.7 
