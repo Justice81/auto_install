@@ -1,20 +1,20 @@
 #!/bin/bash
 # Centreon poller install script for Debian Buster
-# v 1.50
-# 09/05/2020
+# v 1.57
+# 26/11/2020
 # Thanks to Remy, Justice81 and Pixelabs
 #
 export DEBIAN_FRONTEND=noninteractive
 # Variables
 ## Versions
-VERSION_BATCH="v 1.50"
+VERSION_BATCH="v 1.57"
 CLIB_VER="19.10.0"
 CONNECTOR_VER="19.10.1"
-ENGINE_VER="19.10.14"
+ENGINE_VER="19.10.15"
 PLUGIN_VER="2.2"
-PLUGIN_CENTREON_VER="20200204"
-BROKER_VER="19.10.3"
-CENTREON_VER="19.10.10"
+PLUGIN_CENTREON_VER="20200602"
+BROKER_VER="19.10.5"
+CENTREON_VER="19.10.17"
 # MariaDB Series
 MARIADB_VER='10.0'
 ## Sources URL
@@ -109,7 +109,7 @@ function clib_install () {
 ======================================================================
 " | tee -a ${INSTALL_LOG}
 
-apt-get install -y build-essential cmake >> ${INSTALL_LOG}
+apt-get install -y build-essential wget cmake >> ${INSTALL_LOG}
 
 cd ${DL_DIR}
 if [[ -e centreon-clib-${CLIB_VER}.tar.gz ]] ;
@@ -518,7 +518,7 @@ cp ${DIR_SCRIPT}/libinstall/CentPluginsTraps_1910.sh ${DL_DIR}/centreon-web-${CE
 
   [ "$SCRIPT_VERBOSE" = true ] && echo " Apply Centreon template " | tee -a ${INSTALL_LOG}
 
-  /usr/bin/bash ${DL_DIR}/centreon-web-${CENTREON_VER}/install.sh -u /etc/centreon -f ${DL_DIR}/${CENTREON_TMPL} >> ${INSTALL_LOG}
+  /bin/bash ${DL_DIR}/centreon-web-${CENTREON_VER}/install.sh -u /etc/centreon -f ${DL_DIR}/${CENTREON_TMPL} >> ${INSTALL_LOG}
  
 
 }
@@ -603,7 +603,7 @@ rm -rf /tmp/*
 
 [ "$SCRIPT_VERBOSE" = true ] && echo " Generate Centreon template " | tee -a ${INSTALL_LOG}
 
-/usr/bin/bash ${DL_DIR}/centreon-web-${CENTREON_VER}/install.sh -i -f ${DL_DIR}/${CENTREON_TMPL} >> ${INSTALL_LOG}
+/bin/bash ${DL_DIR}/centreon-web-${CENTREON_VER}/install.sh -i -f ${DL_DIR}/${CENTREON_TMPL} >> ${INSTALL_LOG}
 }
 
 function post_install () {
@@ -717,7 +717,7 @@ function main () {
   if [ "$ADD_NRPE" == "yes" ]
   then
 echo "
-================| Centreon Central Install details $VERSION_BATCH |============
+================| Centreon Poller Install details $VERSION_BATCH |============
                   Clib       : ${CLIB_VER}
                   Connector  : ${CONNECTOR_VER}
                   Engine     : ${ENGINE_VER}
@@ -731,7 +731,7 @@ echo "
 "
   else
 echo "
-================| Centreon Central Install details $VERSION_BATCH |============
+================| Centreon Poller Install details $VERSION_BATCH |============
                   Clib       : ${CLIB_VER}
                   Connector  : ${CONNECTOR_VER}
                   Engine     : ${ENGINE_VER}

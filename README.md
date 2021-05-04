@@ -10,6 +10,80 @@ cd auto_install
 
 git checkout v1.x
 
+### version 1.62
+gorgone 20.10.3
+
+bug fix script centreon_install_nagvis
+
+### version 1.61
+centreon-web 20.10.5, engine 20.10.2, broker 20.10.3, gorgone 20.10.2, plugins 20210317
+
+centreon-web 20.04.12, broker 20.04.10, gorgone 20.04.10
+
+new script for install Nagvis 1.9.25
+
+
+### version 1.60
+centreon-web 20.10.3, engine 20.10.2, broker 20.10.3, gorgone 20.10.2, plugins 20210218
+
+
+### version 1.59
+centreon-engine 20.10.1, broker 20.10.2, gorgone 20.10.1, plugins 20201211
+
+### version 1.58
+Update monitoring-plugins 2.3, gorgone 20.04.8
+
+add template lm-sensors
+
+new scripts for Raspberry OS : centreon_central_raspbian_2004.sh and centreon_poller_raspbian_2004.sh
+
+
+### version 1.57
+new script for centreon_central_2010.sh and centreon_poller_2010.sh
+
+centreon-web 19.10.7, broker 20.04.10, gorgone 20.04.7
+
+add template proxmox
+
+
+### version 1.56
+centreon-engine 20.04.7, broker 20.04.9, gorgone 20.04.6, web 20.04.7
+
+centreon-web 19.10.16
+
+centreon-web 19.04.20
+
+bugfix PHP composer and issue #12
+
+### version 1.55
+centreon-engine 20.04.5, broker 20.04.8, gorgone 20.04.4, web 20.04.5
+
+centreon-engine 19.10.15, web 19.10.15
+
+centreon-engine 19.04.18
+
+### version 1.54
+centreon-engine 20.04.4, broker 20.04.7, web 20.04.4
+
+new script create_config_initialV8.sh for plugins 20.04.0 (plugin 20200803)
+
+### version 1.53
+centreon-engine 19.10.14, broker 19.10.5, engine 19.10.14
+
+### version 1.52
+centreon-engine 20.04.2, broker 20.04.4, engine 20.04.1
+
+new script create_config_initialV7.sh for plugins 20.04.0
+
+### version 1.51
+new script for centreon_central_2004.sh and centreon_poller_2004.sh
+
+centreon-engine 20.04.1, broker 20.04.2, gorgone 20.04.2
+
+new function update for 24.04.x see [the explanation page](https://www.sugarbug.fr/blog/files/script-auto-maj2.html)
+
+**Warning update 19.10 -> 20.04 not fonctionnal**
+
 ### version 1.50
 new script for centreon_central_1910.sh and centreon_poller_1910.sh
 

@@ -1,20 +1,20 @@
 #!/bin/bash
 # Centreon 19.04 + engine install script for Debian Buster
-# v 1.48
-# 04/04/2020
+# v 1.56
+# 20/11/2020
 # Thanks to Remy and Pixelabs
 #
 export DEBIAN_FRONTEND=noninteractive
 # Variables
 ## Versions
-VERSION_BATCH="v 1.48"
+VERSION_BATCH="v 1.56"
 CLIB_VER="19.04.1"
 CONNECTOR_VER="19.04.1"
 ENGINE_VER="19.04.3"
 PLUGIN_VER="2.2"
 PLUGIN_CENTREON_VER="20200204"
 BROKER_VER="19.04.0"
-CENTREON_VER="19.04.13"
+CENTREON_VER="19.04.20"
 # MariaDB Series
 MARIADB_VER='10.0'
 ## Sources URL
@@ -28,9 +28,9 @@ BROKER_URL="${BASE_URL}/centreon-broker/centreon-broker-${BROKER_VER}.tar.gz"
 CENTREON_URL="${BASE_URL}/centreon/centreon-web-${CENTREON_VER}.tar.gz"
 CLAPI_URL="${BASE_URL}/Modules/CLAPI/centreon-clapi-${CLAPI_VER}.tar.gz"
 ## Sources widgetsMonitoring engine init.d script
-WIDGET_HOST_VER="19.04.3"
+WIDGET_HOST_VER="19.04.5"
 WIDGET_HOSTGROUP_VER="19.04.1"
-WIDGET_SERVICE_VER="19.04.3"
+WIDGET_SERVICE_VER="19.04.5"
 WIDGET_SERVICEGROUP_VER="19.04.1"
 WIDGET_GRID_MAP_VER="19.04.1"
 WIDGET_TOP_CPU_VER="19.04.2"
@@ -683,7 +683,7 @@ php -r "copy('https://getcomposer.org/installer', 'composer-setup.php');"  >> ${
 php composer-setup.php --install-dir=/usr/bin --filename=composer  >> ${INSTALL_LOG}
 
 #build php dependencies
-composer install --no-dev --optimize-autoloader  >> ${INSTALL_LOG}
+composer install --no-dev --optimize-autoloader -n >> ${INSTALL_LOG}
 
 # add node-js
 apt-get install curl  >> ${INSTALL_LOG}
@@ -744,7 +744,7 @@ sql_mode='ERROR_FOR_DIVISION_BY_ZERO,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION'
 EOF
 
 # Modifiy config systemd
-sed -i -e "s/LimitNOFILE=16364/LimitNOFILE=32000/g" /lib/systemd/system/mariadb.service;
+sed -i -e "s/LimitNOFILE=16384/LimitNOFILE=32000/g" /lib/systemd/system/mariadb.service;
 
 systemctl daemon-reload >> ${INSTALL_LOG}
 systemctl restart mysql >> ${INSTALL_LOG}

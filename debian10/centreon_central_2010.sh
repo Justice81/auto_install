@@ -1,21 +1,20 @@
 #!/bin/bash
-# Centreon 20.04 + engine install script for Debian Buster
-# v 1.61
-# 17/04/2020
+# Centreon 20.10 + engine install script for Debian Buster
+# v 1.62
+# 21/04/2021
 # Thanks to Remy, Justice81, Jisse44 and Pixelabs
 #
 export DEBIAN_FRONTEND=noninteractive
 # Variables
 ## Versions
-VERSION_BATCH="v 1.61"
-CLIB_VER=("20.04.0" "0")
-CONNECTOR_VER=("20.04.0" "0")
-ENGINE_VER=("20.04.7" "0")
-PLUGIN_VER="2.2"
+VERSION_BATCH="v 1.62"
+CLIB_VER=("20.10.0" "0")
+CONNECTOR_VER=("20.10.0" "0")
+ENGINE_VER=("20.10.2" "0")
 PLUGIN_CENTREON_VER=("20210317" "0")
-BROKER_VER=("20.04.12" "0")
-GORGONE_VER=("20.04.10" "0")
-CENTREON_VER=("20.04.12" "0")
+BROKER_VER=("20.10.3" "0")
+GORGONE_VER=("20.10.3" "0")
+CENTREON_VER=("20.10.5" "0")
 # MariaDB Series
 MARIADB_VER='10.0'
 ## Sources URL
@@ -58,17 +57,17 @@ else
   CENTREON_URL="${BASE_URL}/centreon/centreon-web-${CENTREON_VER[0]}.tar.gz"
 fi
 ## Sources widgets 
-WIDGET_HOST_VER="20.04.5"
-WIDGET_HOSTGROUP_VER="20.04.0"
-WIDGET_SERVICE_VER="20.04.4"
-WIDGET_SERVICEGROUP_VER="20.04.0"
-WIDGET_GRID_MAP_VER="20.04.0"
-WIDGET_TOP_CPU_VER="20.04.0"
-WIDGET_TOP_MEMORY_VER="20.04.0"
-WIDGET_TACTICAL_OVERVIEW_VER="20.04.0"
-WIDGET_HTTP_LOADER_VER="20.04.0"
-WIDGET_ENGINE_STATUS_VER="20.04.1"
-WIDGET_GRAPH_VER="20.04.1"
+WIDGET_HOST_VER="20.10.0"
+WIDGET_HOSTGROUP_VER="20.10.0"
+WIDGET_SERVICE_VER="20.10.0"
+WIDGET_SERVICEGROUP_VER="20.10.0"
+WIDGET_GRID_MAP_VER="20.10.0"
+WIDGET_TOP_CPU_VER="20.10.0"
+WIDGET_TOP_MEMORY_VER="20.10.0"
+WIDGET_TACTICAL_OVERVIEW_VER="20.10.0"
+WIDGET_HTTP_LOADER_VER="20.10.0"
+WIDGET_ENGINE_STATUS_VER="20.10.0"
+WIDGET_GRAPH_VER="20.10.0"
 WIDGET_BASE="http://files.download.centreon.com/public/centreon-widgets"
 WIDGET_HOST="${WIDGET_BASE}/centreon-widget-host-monitoring/centreon-widget-host-monitoring-${WIDGET_HOST_VER}.tar.gz"
 WIDGET_HOSTGROUP="${WIDGET_BASE}/centreon-widget-hostgroup-monitoring/centreon-widget-hostgroup-monitoring-${WIDGET_HOSTGROUP_VER}.tar.gz"
@@ -238,7 +237,7 @@ local MAJOUR=$1
 apt-get install -y wget cmake python3-pip >> ${INSTALL_LOG}
 
 cd ${DL_DIR}
-if [[ -e centreon-clib-${CLIB_VER}.tar.gz ]] ;
+if [[ -e centreon-clib-${CLIB_VER}.tar.gz ]] 
   then
     echo 'File already exist !' | tee -a ${INSTALL_LOG}
   else
@@ -387,11 +386,9 @@ function monitoring_plugin_install () {
                      Install Monitoring Plugins
 ======================================================================
 " | tee -a ${INSTALL_LOG}
-local MAJOUR=$1
 
-apt-get install --force-yes -y libgnutls28-dev libssl-dev libkrb5-dev libldap2-dev libsnmp-dev gawk \
-        libwrap0-dev libmcrypt-dev smbclient fping gettext dnsutils libmodule-build-perl libmodule-install-perl \
-        libnet-snmp-perl >> ${INSTALL_LOG}
+
+apt-get install monitoring-plugins -y  >> ${INSTALL_LOG}
 
 ## override message question with gettext values
 yes="$(gettext "y")"
@@ -400,26 +397,7 @@ no="$(gettext "n")"
 # Cleanup to prevent space full on /var
 apt-get clean >> ${INSTALL_LOG}
 
-cd ${DL_DIR}
-if [[ -e monitoring-plugins-${PLUGIN_VER}.tar.gz ]]
-  then
-    echo 'File already exist !' | tee -a ${INSTALL_LOG}
-  else
-    wget --no-check-certificate ${PLUGIN_URL} -O ${DL_DIR}/monitoring-plugins-${PLUGIN_VER}.tar.gz >> ${INSTALL_LOG}
-    [ $? != 0 ] && return 1
-fi
 
-tar xzf monitoring-plugins-${PLUGIN_VER}.tar.gz
-cd ${DL_DIR}/monitoring-plugins-${PLUGIN_VER}
-
-[ "$SCRIPT_VERBOSE" = true ] && echo "====> Compilation" | tee -a ${INSTALL_LOG}
-
-./configure --with-nagios-user=${ENGINE_USER} --with-nagios-group=${ENGINE_GROUP} \
---prefix=/usr/lib/nagios/plugins --libexecdir=/usr/lib/nagios/plugins --enable-perl-modules --with-openssl=/usr/bin/openssl \
---enable-extra-opts >> ${INSTALL_LOG}
-
-make -j $NB_PROC >> ${INSTALL_LOG}
-make install >> ${INSTALL_LOG}
 }
 
 
@@ -916,7 +894,7 @@ cd ${DL_DIR}/${PREFIX}${CENTREON_VER[0]}
 rm -rf /tmp/*
 
 #build php dependencies
-composer install --no-dev --optimize-autoloader -n >> ${INSTALL_LOG}
+composer install --no-dev --optimize-autoloader  -n >> ${INSTALL_LOG}
 
 #build javascript dependencies
 npm ci >> ${INSTALL_LOG}
@@ -1060,7 +1038,6 @@ if [[ $MAJOUR == 2 ]]; then
     sed -i -s '1,4d' /etc/apache2/conf-available/centreon.conf
   fi
 
-
   # reload conf apache
   a2enconf centreon.conf >> ${INSTALL_LOG}
   systemctl restart apache2 php7.3-fpm >> ${INSTALL_LOG}
@@ -1136,6 +1113,12 @@ WantedBy=multi-user.target' > /lib/systemd/system/centreon.service
   cp -r ${DL_DIR}/icones_pixelabs_v2/* ${INSTALL_DIR}/centreon/www/img/media/
   chown -R www-data:www-data ${INSTALL_DIR}/centreon/www/img/media/
   
+  # Install extra pack icônes
+  [ "$SCRIPT_VERBOSE" = true ] && echo "====> Install extra Pack Icônes" | tee -a ${INSTALL_LOG}
+  tar xzf ${DIR_SCRIPT}/icones_extra.tar.gz -C ${DL_DIR}
+  cp -r ${DL_DIR}/icones_extra/* ${INSTALL_DIR}/centreon/www/img/media/
+  chown -R www-data:www-data ${INSTALL_DIR}/centreon/www/img/media/
+
 elif [[ $MAJOUR == 4 ]]; then
 
   #update major
@@ -1177,9 +1160,12 @@ EOF
   #add user gorgone
   usermod -aG ${ENGINE_GROUP} ${GORGONE_USER}
   
-  
-  #bugfix jisse44
-  rm ${INSTALL_DIR}/centreon/src/Centreon/Infrastructure/Acknowledgement/AcknowledgmentRepositoryRDB.php
+    
+  #bugfix cache generation
+  rm ${INSTALL_DIR}/centreon/src/Centreon/Domain/Monitoring/Model/ResourceDetailsHost.php
+  rm ${INSTALL_DIR}/centreon/src/Centreon/Domain/Monitoring/Model/ResourceDetailsTrait.php
+  rm ${INSTALL_DIR}/centreon/src/Centreon/Domain/Monitoring/Model/ImportTrait.php
+  rm ${INSTALL_DIR}/centreon/src/Centreon/Domain/Monitoring/Model/ResourceDetailsService.php 
   
   #stop centcore
   systemctl stop centcore >> ${INSTALL_LOG}
@@ -1309,7 +1295,7 @@ echo "
                   Clib       : ${CLIB_VER[0]}
                   Connector  : ${CONNECTOR_VER[0]}
                   Engine     : ${ENGINE_VER[0]}
-                  Plugins    : ${PLUGIN_VER} & ${PLUGIN_CENTREON_VER[0]}
+                  Plugins    : ${PLUGIN_CENTREON_VER[0]}
                   Broker     : ${BROKER_VER[0]}
                   Gorgone    : ${GORGONE_VER[0]}
                   Centreon   : ${CENTREON_VER[0]}
@@ -1325,7 +1311,7 @@ echo "
                   Clib       : ${CLIB_VER[0]}
                   Connector  : ${CONNECTOR_VER[0]}
                   Engine     : ${ENGINE_VER[0]}
-                  Plugins    : ${PLUGIN_VER} & ${PLUGIN_CENTREON_VER[0]}
+                  Plugins    : ${PLUGIN_CENTREON_VER[0]}
                   Broker     : ${BROKER_VER[0]}
                   Gorgone    : ${GORGONE_VER[0]}
                   Centreon   : ${CENTREON_VER[0]}
@@ -1401,21 +1387,14 @@ if [[ ${MAJ} > 1 ]];
     echo -e     "${bold}Step5${normal}  => Centreon Engine ${CHAINE_UPDATE[${MAJ}]}${STATUS_OK}"
 fi
 
-verify_version "$PLUGIN_VER" "$PLUGIN_VER_OLD"
-MAJ=$?
-if [[ ${MAJ} > 1 ]];
+monitoring_plugin_install 2>>${INSTALL_LOG}
+if [[ $? -ne 0 ]];
   then
-    monitoring_plugin_install ${MAJ}  2>>${INSTALL_LOG}
-    if [[ $? -ne 0 ]];
-      then
-        echo -e "${bold}Step6${normal}  => Monitoring plugins ${CHAINE_UPDATE[${MAJ}]}${STATUS_FAIL}"
-      else
-        echo -e "${bold}Step6${normal}  => Monitoring plugins ${CHAINE_UPDATE[${MAJ}]}${STATUS_OK}"
-        maj_conf "PLUGIN_VER" "$PLUGIN_VER_OLD" "$PLUGIN_VER"    
-    fi
+    echo -e "${bold}Step6${normal}  => Monitoring plugins ${CHAINE_UPDATE[2]}${STATUS_FAIL}"
   else
-    echo -e     "${bold}Step6${normal}  => Monitoring plugins ${CHAINE_UPDATE[${MAJ}]}${STATUS_OK}"
+    echo -e "${bold}Step6${normal}  => Monitoring plugins ${CHAINE_UPDATE[2]}${STATUS_OK}"
 fi
+
 
 verify_version "${PLUGIN_CENTREON_VER[0]}" "$PLUGIN_CENTREON_VER_OLD"
 MAJ=$?

@@ -1,5 +1,38 @@
 #!/bin/bash
-# create_config_initialV4.sh
+# create_config_initialV9.sh
+# version 9.02
+# 11/12/2020
+# add template lm-sensors
+# version 9.01
+# 07/12/2020
+# add template proxmox
+# version 9.00
+# 08/10/2020
+# new option without host configuration
+# version 8.00
+# 07/08/2020
+# new plugin centreon 20020803
+# version 7.00
+# 29/05/2020
+# bugfix cpu
+# version 6.00
+# 24/04/2020
+# add new template apps centreon for gorgone
+# version 5.02
+# 31/03/2020
+# add template windows nrpe
+# version 5.02
+# 25/01/2020
+# add template cisco
+# version 5.01
+# 25/01/2020
+# add template windows
+# version 5
+# 13/01/2020
+# update plugin mysql
+# version 4.02
+# 14/10/2019
+# add parameter icone
 # version 4.01
 # 12/10/2019
 # use debug
@@ -65,26 +98,34 @@
 # define directory
 BASE_DIR=$(dirname $0)
 
-. $BASE_DIR/config4/functions.sh
-. $BASE_DIR/config4/create_base.sh
-. $BASE_DIR/config4/create_template_local.sh
-. $BASE_DIR/config4/create_template_snmp.sh
-. $BASE_DIR/config4/create_apps_mysql.sh
-. $BASE_DIR/config4/create_apps_centreon.sh
+. $BASE_DIR/config5/functions.sh
+. $BASE_DIR/config5/create_base.sh
+. $BASE_DIR/config8/create_template_local.sh
+. $BASE_DIR/config7/create_template_snmp.sh
+. $BASE_DIR/config5/create_template_windows_snmp.sh
+. $BASE_DIR/config5/create_template_windows_nrpe.sh
+. $BASE_DIR/config5/create_template_cisco_snmp.sh
+. $BASE_DIR/config5/create_apps_mysql.sh
+. $BASE_DIR/config6/create_apps_centreon.sh
+. $BASE_DIR/config9/create_apps_gorgone.sh
+. $BASE_DIR/config9/create_template_virt_proxmox.sh
+. $BASE_DIR/config9/create_template_apps_lmsensors_snmp.sh
 
 # Usage info
 show_help() {
 cat << EOF
-Usage: ${0##*/} -u=<user centreon> -p=<passwd centreon> -d=<user database centreon> -w=<passwd database> -s=[yes|no] -m=[restart|reload] -db=[yes|no]
+Usage: ${0##*/} -u=<user centreon> -p=<passwd centreon> -d=<user database centreon> -w=<passwd database> -s=[yes|no] -t=[yes|no] -m=[restart|reload] -db=[yes|no]
 This program create initial configuration
-    -u|--user User Centreon.
-    -p|--password Password Centreon.
-    -d|--userdatabase User Database Centreon
-    -w|--passworddatabase Password Database Centreon.
-    -s|--storage Create Storage service (yes/no)
-    -m|--method Method start engine
-    -db|--debug print command
-    -h|--help     help
+    -u|--user                 User Centreon.
+    -p|--password             Password Centreon.
+    -d|--userdatabase         User Database Centreon
+    -w|--passworddatabase     Password Database Centreon.
+    -s|--storage              Create Storage service (yes/no)
+    -m|--method               Method start engine
+    -i|--icone                Add icones
+    -t|--without              without host configuration
+    -db|--debug               print command
+    -h|--help                 help
 EOF
 }
 
@@ -115,6 +156,14 @@ do
       MODE_START="${i#*=}"
       shift # past argument=value
       ;;
+    -i=*|--icone=*)
+      ADD_ICONE="${i#*=}"
+      shift # past argument=value
+      ;;
+    -t=*|--without=*)
+      ADD_HOST="${i#*=}"
+      shift # past argument=value
+      ;;
     -db=*|--debug=*)
       DEBUG="${i#*=}"
       shift # past argument=value
@@ -137,18 +186,32 @@ if [[ -z "$USER_CENTREON" ]] || [[ -z "$PWD_CENTREON" ]] || [[ -z "$USER_BDD" ]]
     exit 2
 fi
 
-# Check yes/no
+# Check yes/no Storage
 if [[ $ADD_STORAGE =~ ^[yY][eE][sS]|[yY]$ ]]; then
   ADD_STORAGE="yes"
 else
   ADD_STORAGE="no"
 fi
 
-# Check yes/no
-if [[ $DEBUG =~ ^[yY][eE][sS]|[yY]$ ]]; then
-  DEBUG=1
+# Check yes/no Icone
+if [[ $ADD_ICONE =~ ^[yY][eE][sS]|[yY]$ ]]; then
+  ADD_ICONE="yes"
 else
-  DEBUG=0
+  ADD_ICONE="no"
+fi
+
+# Check yes/no Without Host Configuration
+if [[ $ADD_HOST =~ ^[yY][eE][sS]|[yY]$ ]]; then
+  ADD_HOST="yes"
+else
+  ADD_HOST="no"
+fi
+
+# Check yes/no Install Web
+if [[ $DEBUG =~ ^[yY][eE][sS]|[yY]$ ]]; then
+  DEBUG="yes"
+else
+  DEBUG="no"
 fi
 
 
@@ -185,10 +248,33 @@ echo "Create Command snmp"
 
 create_cmd_snmp
 
+echo "Create Command Windows snmp"
+
+create_cmd_windows_snmp
+
+echo "Create Command Windows nrpe"
+
+create_cmd_windows_nrpe
+
+echo "Create Command Cisco snmp"
+
+create_cmd_cisco_snmp
+
 echo "Create Command mysql"
 
 create_cmd_mysql
 
+echo "Create Command gorgone"
+
+create_cmd_gorgone
+
+echo "Create Command Proxmox"
+
+create_cmd_virt_proxmox
+
+echo "Create Command Lm-Sensors"
+
+create_cmd_lmsensors
 
 #*****************
 
@@ -207,7 +293,17 @@ echo "Create template service snmp"
 
 create_stpl_snmp
 
+echo "Create template service Windows snmp"
 
+create_stpl_windows_snmp
+
+echo "Create template service Windows nrpe"
+
+create_stpl_windows_nrpe
+
+echo "Create template service Cisco snmp"
+
+create_stpl_cisco_snmp
 
 #*****************
 
@@ -223,60 +319,85 @@ echo "Create template app centreon central"
 
 create_stpl_central
 
+echo "Create template app centreon gorgone"
+
+create_stpl_gorgone
+
+echo "Create template virt Proxmox"
+
+create_stpl_virt_proxmox
+
+echo "Create template app lm-sensors"
+
+create_stpl_lmsensors_snmp
+
 ################################
 #*******HOTES MODELES **********
 ################################
-echo "Create template host"
-
+echo "Create templates host"
+echo "- base"
 create_htpl_base
-
+echo "- linux local"
 create_linux_local
-
+echo "- linux snmp"
 create_linux_snmp
-
+echo "- poller"
 create_centreon_poller
-
+echo "- central"
 create_centreon_central
-
+echo "- mysql"
 create_apps_mysql
+echo "- windows snmp"
+create_windows_snmp
+echo "- windows nrpe"
+create_windows_nrpe
+echo "- cisco"
+create_cisco_snmp
+echo "- gorgone"
+create_app_centreon_gorgone
+echo "- proxmox"
+create_virt_proxmox
+echo "- lm-sensors"
+create_app_lmsensors_snmp
 
-
-
-
-################################################################
-#               Creation hote Supervision                      #
-################################################################
-echo "Create Central"
-exist_object host Central
-if [ $? -ne 0 ]
+if [ "$ADD_HOST" == "yes" ]
 then
-  $CLAPI -o host -a add -v "Central;Monitoring Server;127.0.0.1;;central;"
-  $CLAPI -o host -a addtemplate -v "Central;htpl_OS-Linux-local"
-  if [ "$ADD_STORAGE" == "yes" ]
+  ################################################################
+  #               Creation hote Supervision                      #
+  ################################################################
+  echo "Create Central"
+  exist_object host Central
+  if [ $? -ne 0 ]
   then
-    echo "add storage"
-    for i in `/usr/lib/centreon/plugins/centreon_linux_local.pl --plugin=os::linux::local::plugin --mode=list-storages --filter-type=ext | /bin/grep -v Skipping | /bin/sed '1d' | /usr/bin/awk ' { print $1} '`
-    do
-      $CLAPI -o service -a add -v "Central;Storage-$i;stpl_os_linux_local_disk_name"
-      $CLAPI -o service -a setmacro -v "Central;Storage-`echo $i | sed "s/'//g"`;DISKNAME;$i"
-    done
+    $CLAPI -o host -a add -v "Central;Monitoring Server;127.0.0.1;;central;"
+    $CLAPI -o host -a addtemplate -v "Central;htpl_OS-Linux-local"
+    if [ "$ADD_STORAGE" == "yes" ]
+    then
+      echo "add storage"
+      for i in `/usr/lib/centreon/plugins/centreon_linux_local.pl --plugin=os::linux::local::plugin --mode=list-storages --filter-type=ext | /bin/grep -v Skipping | /bin/sed '1d' | /usr/bin/awk ' { print $1} '`
+      do
+        $CLAPI -o service -a add -v "Central;Storage-$i;stpl_os_linux_local_disk_name"
+        $CLAPI -o service -a setmacro -v "Central;Storage-`echo $i | sed "s/'//g"`;DISKNAME;$i"
+      done
+    fi
+    $CLAPI -o host -a addtemplate -v "Central;htpl_App-MySQL"
+    $CLAPI -o host -a addtemplate -v "Central;htpl_App-centreon-poller"
+    $CLAPI -o host -a addtemplate -v "Central;htpl_App-centreon-central"
+    $CLAPI -o host -a addtemplate -v "Central;htpl_App-centreon-gorgone"
+    $CLAPI -o host -a setmacro -v "Central;SNMPCOMMUNITY;public"
+    $CLAPI -o host -a setmacro -v "Central;SNMPVERSION;2c"
+    $CLAPI -o host -a setmacro -v "Central;MYSQLUSERNAME;${USER_BDD}"
+    $CLAPI -o host -a setmacro -v "Central;MYSQLPASSWORD;${PWD_BDD}"
+
+    # application des modeles a l hote
+    $CLAPI -o host -a applytpl -v "Central"
+
+    #retrieve name interface
+    NAMEINTERFACE=`ip link | grep 'state UP' | awk -F: '$0 !~ "lo|vir|^[^0-9]"{print $2a;getline}'`
+
+    $CLAPI -o service -a add -v "Central;Interface-$NAMEINTERFACE;stpl_os_linux_local_network_name"
+    $CLAPI -o service -a setmacro -v "Central;Interface-$NAMEINTERFACE;INTERFACE;$NAMEINTERFACE"
   fi
-  $CLAPI -o host -a addtemplate -v "Central;htpl_App-MySQL"
-  $CLAPI -o host -a addtemplate -v "Central;htpl_App-centreon-poller"
-  $CLAPI -o host -a addtemplate -v "Central;htpl_App-centreon-central"
-  $CLAPI -o host -a setmacro -v "Central;SNMPCOMMUNITY;public"
-  $CLAPI -o host -a setmacro -v "Central;SNMPVERSION;2c"
-  $CLAPI -o host -a setmacro -v "Central;MYSQLUSERNAME;${USER_BDD}"
-  $CLAPI -o host -a setmacro -v "Central;MYSQLPASSWORD;${PWD_BDD}"
-
-  # application des modeles a l hote
-  $CLAPI -o host -a applytpl -v "Central"
-
-  #retrieve name interface
-  NAMEINTERFACE=`ip link | grep 'state UP' | awk -F: '$0 !~ "lo|vir|^[^0-9]"{print $2a;getline}'`
-
-  $CLAPI -o service -a add -v "Central;Interface-$NAMEINTERFACE;stpl_os_linux_local_network_name"
-  $CLAPI -o service -a setmacro -v "Central;Interface-$NAMEINTERFACE;INTERFACE;$NAMEINTERFACE"
 fi
 
 ### application des commandes de notification pour l'admin
@@ -302,6 +423,10 @@ if [ $? = 0 ];then
    fi
    RESULT=`$CLAPI $MODE_START`
    if [ $? = 0 ];then
+     if [[ $MODE_START == "-a pollerrestart -v 1" ]];then
+       echo "Restart cbd..."
+       systemctl restart cbd
+     fi
      echo "Configuration OK !"
    else
      echo "Error Reload/Restart Configuration !!!"

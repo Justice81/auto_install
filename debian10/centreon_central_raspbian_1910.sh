@@ -1,20 +1,20 @@
 #!/bin/bash
 # Centreon 19.10 + engine install script for Raspian Buster
-# v 1.48
-# 04/04/2020
+# v 1.55
+# 17/09/2020
 # Thanks to Remy, Justice81 and Pixelabs
 #
 export DEBIAN_FRONTEND=noninteractive
 # Variables
 ## Versions
-VERSION_BATCH="v 1.48"
+VERSION_BATCH="v 1.55"
 CLIB_VER="19.10.0"
 CONNECTOR_VER="19.10.1"
-ENGINE_VER="19.10.13"
+ENGINE_VER="19.10.15"
 PLUGIN_VER="2.2"
-PLUGIN_CENTREON_VER="20200204"
-BROKER_VER="19.10.3"
-CENTREON_VER="19.10.10"
+PLUGIN_CENTREON_VER="20200602"
+BROKER_VER="19.10.5"
+CENTREON_VER="19.10.15"
 # MariaDB Series
 MARIADB_VER='10.0'
 ## Sources URL
@@ -28,16 +28,16 @@ BROKER_URL="${BASE_URL}/centreon-broker/centreon-broker-${BROKER_VER}.tar.gz"
 CENTREON_URL="${BASE_URL}/centreon/centreon-web-${CENTREON_VER}.tar.gz"
 CLAPI_URL="${BASE_URL}/Modules/CLAPI/centreon-clapi-${CLAPI_VER}.tar.gz"
 ## Sources widgetsMonitoring engine init.d script
-WIDGET_HOST_VER="19.10.1"
+WIDGET_HOST_VER="19.10.6"
 WIDGET_HOSTGROUP_VER="19.10.1"
-WIDGET_SERVICE_VER="19.10.2"
+WIDGET_SERVICE_VER="19.10.6"
 WIDGET_SERVICEGROUP_VER="19.10.1"
 WIDGET_GRID_MAP_VER="19.10.1"
 WIDGET_TOP_CPU_VER="19.10.1"
 WIDGET_TOP_MEMORY_VER="19.10.1"
 WIDGET_TACTICAL_OVERVIEW_VER="19.10.1"
 WIDGET_HTTP_LOADER_VER="19.10.1"
-WIDGET_ENGINE_STATUS_VER="19.10.1"
+WIDGET_ENGINE_STATUS_VER="19.10.2"
 WIDGET_GRAPH_VER="19.10.1"
 WIDGET_BASE="http://files.download.centreon.com/public/centreon-widgets"
 WIDGET_HOST="${WIDGET_BASE}/centreon-widget-host-monitoring/centreon-widget-host-monitoring-${WIDGET_HOST_VER}.tar.gz"
@@ -121,7 +121,7 @@ function clib_install () {
 ======================================================================
 " | tee -a ${INSTALL_LOG}
 
-apt-get install -y build-essential cmake >> ${INSTALL_LOG}
+apt-get install -y build-essential wget cmake >> ${INSTALL_LOG}
 
 cd ${DL_DIR}
 if [[ -e centreon-clib-${CLIB_VER}.tar.gz ]] ;
@@ -217,7 +217,7 @@ function centreon_engine_install () {
                     Install Centreon Engine
 ======================================================================
 " | tee -a ${INSTALL_LOG}
-git clone https://github.com/kermith72/auto_install.git
+
 groupadd -g 6001 ${ENGINE_GROUP}
 useradd -u 6001 -g ${ENGINE_GROUP} -m -r -d /var/lib/centreon-engine -c "Centreon-engine Admin" -s /bin/bash ${ENGINE_USER}
 
@@ -736,7 +736,7 @@ sql_mode='ERROR_FOR_DIVISION_BY_ZERO,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION'
 EOF
 
 # Modifiy config systemd
-sed -i -e "s/LimitNOFILE=16364/LimitNOFILE=32000/g" /lib/systemd/system/mariadb.service;
+sed -i -e "s/LimitNOFILE=16384/LimitNOFILE=32000/g" /lib/systemd/system/mariadb.service;
 
 systemctl daemon-reload >> ${INSTALL_LOG}
 systemctl restart mysql >> ${INSTALL_LOG}
